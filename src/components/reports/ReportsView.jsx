@@ -55,7 +55,7 @@ export default function ReportsView({ patients }) {
 
   return (
     <Stack>
-      <Title order={3}>Maternal Care Reports</Title>
+      <Title order={3}>Maternal Care Reports (WORK IN PROGRESS)</Title>
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <Paper withBorder p="lg" radius="md" shadow="sm">
           <Group mb="md">
@@ -64,9 +64,6 @@ export default function ReportsView({ patients }) {
           </Group>
           <Text size="sm" c="dimmed" mb="md">
             Standard FHSIS layout. Includes indicators for Prenatal Care, Immunization (Td), Nutrition (BMI), and Deliveries aggregated by age group (10-14, 15-19, 20-49).
-          </Text>
-          <Text size="xs" c="dimmed" mb="sm">
-            Filter by report month (DOH-style): include only patients with activity in the selected month (registration, delivery, visits, Td, supplements, labs, or PNC in that month).
           </Text>
           <Grid mb="lg">
             <Grid.Col span={{ base: 12, xs: 6 }}>

@@ -174,8 +174,12 @@ export default function RecordsView({
                     <Table.Td>{statusBadges}</Table.Td>
                     <Table.Td>
                       <Group gap={5}>
-                        <ActionIcon color="blue" variant="light" onClick={() => handleEditClick(p)}><Edit size={16} /></ActionIcon>
-                        {isAdmin && <ActionIcon color="red" variant="light" onClick={() => handleDelete(p.id)}><Trash size={16} /></ActionIcon>}
+                        <ActionIcon color="blue" variant="light" onClick={() => handleEditClick(p)}>
+                          <Edit size={16} />
+                        </ActionIcon>
+                        <ActionIcon color="red" variant="light" onClick={() => handleDelete(p)}>
+                          <Trash size={16} />
+                        </ActionIcon>
                       </Group>
                     </Table.Td>
                   </Table.Tr>

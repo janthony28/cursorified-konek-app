@@ -88,7 +88,22 @@ function MainApp({ session, onLogout }) {
     if (!error) setPatients(data || []);
   }
 
-  async function handleDelete(id) { if (!confirm('Delete?')) return; await supabase.from('maternal_records').delete().eq('id', id); fetchPatients(); }
+  async function handleDelete(patient) {
+    if (!confirm('Delete?')) return;
+
+    let query = supabase.from('maternal_records').delete().eq('id', patient.id);
+    if (!isAdmin) {
+      query = query.eq('created_by', session.user.id);
+    }
+
+    const { error } = await query;
+    if (error) {
+      notifications.show({ title: 'Error', message: error.message, color: 'red' });
+      return;
+    }
+
+    fetchPatients();
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

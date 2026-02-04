@@ -1,0 +1,104 @@
+import { Paper, Box, Grid, TextInput, Input, NumberInput, Select, Checkbox, Stack, Group, Text, Button, Badge, Radio } from '@mantine/core';
+import { ArrowRight } from 'lucide-react';
+import { BATANGAS_BARANGAYS } from '../../../lib/constants';
+
+export default function GeneralTab({ formData, setFormData, formErrors, getAgeGroup, handleLmpChange, nextTab }) {
+  return (
+    <>
+      <Paper withBorder radius="md" overflow="hidden" mb="md">
+        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Text size="sm" fw={700} c="blue.9" align="center">Personal Information</Text>
+        </Box>
+        <Grid p="sm">
+          <Grid.Col span={4}> <TextInput error={formErrors.last_name} label="Last Name" placeholder="Dela Cruz" withAsterisk value={formData.last_name || ''} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })} /> </Grid.Col>
+          <Grid.Col span={4}> <TextInput error={formErrors.first_name} label="First Name" placeholder="Juana" withAsterisk value={formData.first_name || ''} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })} /> </Grid.Col>
+          <Grid.Col span={4}> <TextInput label="Middle Name" placeholder="Santos" value={formData.middle_name || ''} onChange={(e) => setFormData({ ...formData, middle_name: e.target.value })} /> </Grid.Col>
+          <Grid.Col span={12}> <TextInput error={formErrors.address} withAsterisk label="Complete Address" placeholder="House No., Street, etc." value={formData.address || ''} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /> </Grid.Col>
+          <Grid.Col span={6}> <Select error={formErrors.barangay} label="Barangay" placeholder="Select Barangay" data={BATANGAS_BARANGAYS} searchable value={formData.barangay || ''} onChange={(val) => setFormData({ ...formData, barangay: val })} /> </Grid.Col>
+          <Grid.Col span={6}> <TextInput label="Sitio / Purok" placeholder="(Optional)" value={formData.sitio || ''} onChange={(e) => setFormData({ ...formData, sitio: e.target.value })} /> </Grid.Col>
+          <Grid.Col span={6}> <NumberInput error={formErrors.age} label="Age" withAsterisk value={formData.age === null ? '' : formData.age} onChange={(val) => setFormData({ ...formData, age: val })} /> </Grid.Col>
+          <Grid.Col span={6}> <TextInput label="Age Group" readOnly value={getAgeGroup(formData.age)} variant="filled" /> </Grid.Col>
+          <Grid.Col span={6}> <Input.Wrapper label="Date of Registration"> <Input type="date" value={formData.date_of_registration || ''} onChange={(e) => setFormData({ ...formData, date_of_registration: e.target.value })} /> </Input.Wrapper> </Grid.Col>
+        </Grid>
+      </Paper>
+
+      <Paper withBorder radius="md" overflow="hidden" style={{ borderColor: '#dee2e6' }}>
+        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Text size="sm" fw={700} c="blue.9" align="center">Pregnancy Information</Text>
+        </Box>
+        <Grid p="sm">
+          <Grid.Col span={6}> <Input.Wrapper label="LMP (Last Menstrual Period)" withAsterisk error={formErrors.lmp}> <Input error={formErrors.lmp} type="date" value={formData.lmp || ''} onChange={handleLmpChange} /> </Input.Wrapper> </Grid.Col>
+          <Grid.Col span={6}> <Input.Wrapper label="EDC (Estimated Date of Confinement)"> <Input type="date" disabled style={{ backgroundColor: '#e9ecef', fontWeight: 'bold', color: '#0ca678' }} value={formData.edc || ''} /> </Input.Wrapper> </Grid.Col>
+          <Grid.Col span={6}> <NumberInput error={formErrors.gravida} label="Gravida (No. of Pregnancies)" withAsterisk min={1} value={formData.gravida === null ? '' : formData.gravida} onChange={(val) => setFormData({ ...formData, gravida: val })} /> </Grid.Col>
+          <Grid.Col span={6}> <NumberInput error={formErrors.parity} label="Parity (No. of Births)" withAsterisk min={0} value={formData.parity === null ? '' : formData.parity} onChange={(val) => setFormData({ ...formData, parity: val })} /> </Grid.Col>
+        </Grid>
+      </Paper>
+
+      <Paper withBorder radius="md" overflow="hidden" mt="md" style={{ borderColor: formData.manual_risk ? 'red' : '#dee2e6' }}>
+        <Box bg="red.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Group justify="space-between">
+            <Text size="sm" fw={700} c="red.9">Risk Factors</Text>
+            {formData.manual_risk && <Badge color="red" variant="filled">HIGH RISK</Badge>}
+          </Group>
+        </Box>
+        <Stack p="sm">
+          <Checkbox
+            label="Is this patient High Risk?"
+            checked={formData.manual_risk || false}
+            onChange={(e) => {
+              const checked = e.currentTarget.checked;
+              setFormData({
+                ...formData,
+                manual_risk: checked,
+                ...(checked
+                  ? {}
+                  : {
+                    has_hypertension: false,
+                    has_gestational_diabetes: false,
+                    high_risk_reason: '',
+                    // Calcium carbonate supplementation is only applicable for high-risk patients.
+                    // Keep storage in `supplements_calcium` (JSON) so it maps cleanly to existing export logic.
+                    supplements_calcium: [],
+                    calcium_carbonate_completed: false,
+                  }),
+              });
+            }}
+            color="red"
+            size="md"
+          />
+          {formData.manual_risk && (
+            <Stack gap="xs">
+              <Radio.Group
+                label="High risk reason"
+                value={
+                  formData.has_hypertension ? 'hypertension' : formData.has_gestational_diabetes ? 'gestational_diabetes' : 'others'
+                }
+                onChange={(value) => {
+                  if (value === 'hypertension') setFormData({ ...formData, has_hypertension: true, has_gestational_diabetes: false, high_risk_reason: '' });
+                  else if (value === 'gestational_diabetes') setFormData({ ...formData, has_hypertension: false, has_gestational_diabetes: true, high_risk_reason: '' });
+                  else setFormData({ ...formData, has_hypertension: false, has_gestational_diabetes: false });
+                }}
+              >
+                <Stack mt="xs" gap="xs">
+                  <Radio value="hypertension" label="Hypertension" color="red" />
+                  <Radio value="gestational_diabetes" label="Gestational Diabetes" color="red" />
+                  <Radio value="others" label="Others" color="red" />
+                </Stack>
+              </Radio.Group>
+              {(formData.has_hypertension ? false : !formData.has_gestational_diabetes) && (
+                <TextInput
+                  label="Specify reason (Others)"
+                  placeholder="e.g., Age, History of C-Section..."
+                  value={formData.high_risk_reason || ''}
+                  onChange={(e) => setFormData({ ...formData, high_risk_reason: e.target.value })}
+                />
+              )}
+            </Stack>
+          )}
+        </Stack>
+      </Paper>
+
+      <Group justify="flex-end" mt="md"><Button rightSection={<ArrowRight size={16} />} onClick={() => nextTab('prenatal')}>Next Section</Button></Group>
+    </>
+  );
+}

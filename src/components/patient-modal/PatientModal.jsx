@@ -89,6 +89,7 @@ export default function PatientModal({
           <DeliveryTab
             formData={formData}
             setFormData={setFormData}
+            formErrors={formErrors}
             handleBirthWeightChange={handleBirthWeightChange}
             handleBabySexChange={handleBabySexChange}
             isAborted={isAborted}

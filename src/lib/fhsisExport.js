@@ -61,8 +61,8 @@ export async function exportToExcel(patients, options = {}) {
       hepb_screened: !!logs.find((l) => l.type === 'Hep B') || !!p.lab_hepb_result,
       hepb_positive: (logs.find((l) => l.type === 'Hep B')?.result === 'Positive') || (p.lab_hepb_result === 'Reactive'),
       hiv_screened: !!logs.find((l) => l.type === 'HIV') || !!p.lab_hiv_result,
-      cbc_screened: !!logs.find((l) => l.type === 'CBC (Anemia)') || !!p.lab_cbc_result,
-      cbc_positive: (logs.find((l) => l.type === 'CBC (Anemia)')?.result === 'With Anemia') || (p.lab_cbc_result === 'With Anemia'),
+      cbc_screened: !!logs.find((l) => l.type === 'CBC') || !!p.lab_cbc_result,
+      cbc_positive: (logs.find((l) => l.type === 'CBC')?.result === 'With Anemia') || (p.lab_cbc_result === 'With Anemia'),
       gd_screened: !!logs.find((l) => l.type === 'Gestational Diabetes') || !!p.lab_diabetes_result,
       gd_positive: (logs.find((l) => l.type === 'Gestational Diabetes')?.result === 'Positive') || (p.lab_diabetes_result === 'Positive'),
     };

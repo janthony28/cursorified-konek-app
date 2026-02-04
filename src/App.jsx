@@ -75,7 +75,7 @@ function MainApp({ session, onLogout }) {
   const [formData, setFormData] = useState(initialFormState);
   const [newVisit, setNewVisit] = useState({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
   const [newSupp, setNewSupp] = useState({ type: 'IFA', date: '', count: '' });
-  const [newLab, setNewLab] = useState({ type: 'CBC (Anemia)', date: '', result: '' });
+  const [newLab, setNewLab] = useState({ type: 'CBC', date: '', result: '' });
   const [newPostpartumLog, setNewPostpartumLog] = useState({ date: '', count: '', remarks: '' });
 
   useEffect(() => { const t = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -430,6 +430,8 @@ function MainApp({ session, onLogout }) {
     if (isInvalid(formData.lmp)) setError('lmp', 'general', 'LMP is required');
     if (isInvalid(formData.gravida)) setError('gravida', 'general', 'Gravida is required');
     if (isInvalid(formData.parity)) setError('parity', 'general', 'Parity is required');
+    const isAbortedCheck = formData.delivery_outcome === 'AB' || formData.delivery_outcome === 'FD';
+    if (!isAbortedCheck && isInvalid(formData.delivery_mode)) setError('delivery_mode', 'delivery', 'Delivery type is required');
 
     setFormErrors(newErrors);
     if (firstErrorTab) {

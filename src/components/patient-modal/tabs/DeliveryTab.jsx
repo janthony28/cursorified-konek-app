@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Paper, Box, Stack, Group, Grid, Input, Select, TextInput, Radio, Text, NumberInput, Button } from '@mantine/core';
+import { Paper, Box, Stack, Group, Grid, Input, Select, TextInput, Checkbox, Text, NumberInput, Button } from '@mantine/core';
 import { ArrowRight } from 'lucide-react';
 
-export default function DeliveryTab({ formData, setFormData, handleBirthWeightChange, handleBabySexChange, isAborted, nextTab }) {
+export default function DeliveryTab({ formData, setFormData, formErrors, handleBirthWeightChange, handleBabySexChange, isAborted, nextTab }) {
   const [selectedBabyIndex, setSelectedBabyIndex] = useState(0);
 
   const pregnancyType = formData.pregnancy_type || '';
@@ -173,13 +173,23 @@ export default function DeliveryTab({ formData, setFormData, handleBirthWeightCh
               <Text size="sm" fw={700} c="blue.9" align="center">Delivery Type</Text>
             </Box>
             <Stack p="sm">
-              <Radio.Group value={formData.delivery_mode || ''} onChange={(val) => setFormData({ ...formData, delivery_mode: val })}>
+              <Input.Wrapper error={formErrors?.delivery_mode} description={formErrors?.delivery_mode ? null : undefined}>
                 <Stack gap="xs">
-                  <Radio disabled={isAborted} value="CS" label="CS - Cesarean Section" />
-                  <Radio disabled={isAborted} value="VD" label="VD - Vaginal Delivery" />
-                  <Radio disabled={isAborted} value="CVCD" label="CVCD - Combined Vaginal-Cesarean" />
+                  {[
+                    { value: 'CS', label: 'CS - Cesarean Section' },
+                    { value: 'VD', label: 'VD - Vaginal Delivery' },
+                    { value: 'CVCD', label: 'CVCD - Combined Vaginal-Cesarean' },
+                  ].map(({ value, label }) => (
+                    <Checkbox
+                      key={value}
+                      disabled={isAborted}
+                      checked={(formData.delivery_mode || '') === value}
+                      label={label}
+                      onChange={() => setFormData({ ...formData, delivery_mode: (formData.delivery_mode || '') === value ? '' : value })}
+                    />
+                  ))}
                 </Stack>
-              </Radio.Group>
+              </Input.Wrapper>
             </Stack>
           </Paper>
         </Grid.Col>

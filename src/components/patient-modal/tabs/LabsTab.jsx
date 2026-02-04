@@ -11,34 +11,38 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
         </Box>
         <Stack p="sm">
           <Group align="end">
-            <Select label="Test Type" data={['CBC (Anemia)', 'Gestational Diabetes', 'Syphilis', 'HIV', 'Hep B']} value={newLab.type} onChange={(v) => setNewLab({ ...newLab, type: v, result: '' })} style={{ width: 200 }} />
+            <Select label="Test Type" data={['CBC', 'Gestational Diabetes', 'Syphilis', 'HIV', 'Hep B']} value={newLab.type} onChange={(v) => setNewLab({ ...newLab, type: v, date: '', result: '' })} style={{ width: 200 }} />
             <Input.Wrapper label="Date"><Input type="date" value={newLab.date} onChange={(e) => setNewLab({ ...newLab, date: e.target.value })} /></Input.Wrapper>
             <Select
+              key={newLab.type}
               label="Result"
               placeholder="Select result"
               data={
-                newLab.type === 'CBC (Anemia)'
+                newLab.type === 'CBC'
                   ? ['With Anemia', 'Without Anemia', 'Prefer not to say']
                   : ['Positive', 'Negative', 'Prefer not to say']
               }
-              value={newLab.result}
-              onChange={(v) => setNewLab({ ...newLab, result: v })}
+              value={newLab.result || null}
+              onChange={(v) => setNewLab({ ...newLab, result: v ?? '' })}
             />
             <Button onClick={addLabLog} leftSection={<Plus size={16} />}>Add Result</Button>
           </Group>
           <Table striped withTableBorder>
             <Table.Thead><Table.Tr><Table.Th>Test</Table.Th><Table.Th>Date</Table.Th><Table.Th>Result</Table.Th><Table.Th></Table.Th></Table.Tr></Table.Thead>
             <Table.Tbody>
-              {(formData.lab_logs || []).map((log, i) => {
+              {[...(formData.lab_logs || [])]
+                .map((log, originalIndex) => ({ log, originalIndex }))
+                .sort((a, b) => (b.log.date || '').localeCompare(a.log.date || ''))
+                .map(({ log, originalIndex }) => {
                 const isBad = ['Positive', 'With Anemia'].includes(log.result);
                 return (
-                  <Table.Tr key={i} bg={isBad ? 'red.1' : undefined}>
+                  <Table.Tr key={originalIndex} bg={isBad ? 'red.1' : undefined}>
                     <Table.Td fw={500}>{log.type}</Table.Td>
                     <Table.Td>{formatDate(log.date)}</Table.Td>
                     <Table.Td>
                       {isBad ? <Badge color="red">{log.result}</Badge> : <Badge color="gray">{log.result}</Badge>}
                     </Table.Td>
-                    <Table.Td><ActionIcon color="red" size="sm" onClick={() => removeLabLog(i)}><Trash size={14} /></ActionIcon></Table.Td>
+                    <Table.Td><ActionIcon color="red" size="sm" onClick={() => removeLabLog(originalIndex)}><Trash size={14} /></ActionIcon></Table.Td>
                   </Table.Tr>
                 );
               })}

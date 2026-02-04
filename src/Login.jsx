@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
-import { Container, Paper, Title, Text, TextInput, PasswordInput, Button, Group, Anchor, Stack } from '@mantine/core';
+import { Container, Paper, Title, Text, TextInput, PasswordInput, Button, Group, Anchor, Stack, Box } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { Stethoscope } from 'lucide-react';
 
@@ -26,8 +26,18 @@ export default function Login() {
   };
 
   return (
-    <Container size={420} my={40}>
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+    <Box
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(165deg, #e6fcf5 0%, #b2f2e2 30%, #f0f4f8 70%, #fff 100%)',
+        padding: 24,
+      }}
+    >
+      <Container size={420} style={{ flex: '0 1 auto' }}>
+        <Paper className="login-card-reveal" withBorder shadow="xl" p={30} radius="lg" style={{ borderColor: 'rgba(12, 166, 120, 0.2)' }}>
         {/* LOGO SECTION [Source: PDF Page 2] */}
         <Group justify="center" mb="md">
           <Stethoscope size={64} color="#0ca678" strokeWidth={1.5} />
@@ -76,5 +86,6 @@ export default function Login() {
         </form>
       </Paper>
     </Container>
+    </Box>
   );
 }

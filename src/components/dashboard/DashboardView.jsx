@@ -31,7 +31,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
     <Stack gap="lg">
       <Grid>
         <Grid.Col span={{ base: 12, md: 8 }}>
-          <Paper p="lg" radius="md" bg="teal.0">
+          <Paper className="dashboard-card" p="lg" radius="md" bg="teal.0">
             <Title order={2} c="teal.9">Welcome Back!</Title>
             <Group mt="xs">
               <ThemeIcon color="teal" variant="light" size="lg"><Clock size={20} /></ThemeIcon>
@@ -44,7 +44,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
           </Paper>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <Paper p="md" radius="md" bg="red.0" withBorder style={{ borderColor: 'red' }}>
+          <Paper className="dashboard-card" p="md" radius="md" bg="red.0" withBorder style={{ borderColor: 'red' }}>
             <Group mb="xs"><Phone size={20} color="red" /><Text fw={700} c="red.9">EMERGENCY HOTLINES</Text></Group>
             <Stack gap={2}>
               <Text size="sm" fw={600}>City Health Office: <span style={{ fontWeight: 400 }}>0912-345-6789</span></Text>
@@ -56,7 +56,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
       </Grid>
 
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-        <Paper shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #e6fcf5 0%, #fff 100%)', borderLeft: '5px solid #0ca678', ...cardStyle }}
+        <Paper className="dashboard-card" shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #e6fcf5 0%, #fff 100%)', borderLeft: '5px solid #0ca678', ...cardStyle }}
           onClick={() => onFilterSelect('all')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = hoverStyle.transform; e.currentTarget.style.boxShadow = hoverStyle.boxShadow; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'; }}
@@ -70,7 +70,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
           </Group>
         </Paper>
 
-        <Paper shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #fff 100%)', borderLeft: '5px solid #fa5252', ...cardStyle }}
+        <Paper className="dashboard-card" shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #fff5f5 0%, #fff 100%)', borderLeft: '5px solid #fa5252', ...cardStyle }}
           onClick={() => onFilterSelect('high_risk')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = hoverStyle.transform; e.currentTarget.style.boxShadow = hoverStyle.boxShadow; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'; }}
@@ -84,7 +84,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
           </Group>
         </Paper>
 
-        <Paper shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #fff9db 0%, #fff 100%)', borderLeft: '5px solid #fd7e14', ...cardStyle }}
+        <Paper className="dashboard-card" shadow="sm" p="lg" radius="md" bg="gradient" style={{ background: 'linear-gradient(135deg, #fff9db 0%, #fff 100%)', borderLeft: '5px solid #fd7e14', ...cardStyle }}
           onClick={() => onFilterSelect('due')}
           onMouseEnter={(e) => { e.currentTarget.style.transform = hoverStyle.transform; e.currentTarget.style.boxShadow = hoverStyle.boxShadow; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'; }}
@@ -100,7 +100,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
       </SimpleGrid>
 
       {duePatients.length > 0 && (
-        <Paper shadow="md" p="md" radius="md" withBorder mb="lg" bg="orange.0" style={{ borderColor: 'orange' }}>
+        <Paper className="dashboard-card" shadow="md" p="md" radius="md" withBorder mb="lg" bg="orange.0" style={{ borderColor: 'orange' }}>
           <Group mb="xs">
             <AlertTriangle size={20} color="orange" />
             <Text fw={700} c="orange.9">Upcoming Visits Required ({currentMonthName})</Text>
@@ -124,7 +124,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
         </Paper>
       )}
 
-      <Paper shadow="sm" p="lg" radius="md" withBorder>
+      <Paper className="dashboard-card" shadow="sm" p="lg" radius="md" withBorder>
         <Group justify="space-between" mb="md">
           <Title order={4} c="dimmed">Recently Added / Modified</Title>
         </Group>

@@ -13,6 +13,8 @@ import AppShellLayout from './components/layout/AppShellLayout';
 import PatientModal from './components/patient-modal/PatientModal';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
+import { Box, Loader, Text } from '@mantine/core';
+import { Stethoscope } from 'lucide-react';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -26,7 +28,25 @@ function App() {
 
   const clearSession = () => setSession(null);
 
-  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  if (loading) {
+    return (
+      <Box
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          gap: 16,
+          background: 'linear-gradient(160deg, #e6fcf5 0%, #f0f4f8 50%, #fff 100%)',
+        }}
+      >
+        <Stethoscope size={48} color="#0ca678" strokeWidth={1.5} style={{ opacity: 0.9 }} />
+        <Loader color="teal" type="dots" size="lg" />
+        <Text size="sm" c="dimmed" fw={500}>Loading KONEK Health…</Text>
+      </Box>
+    );
+  }
   if (!session) return <Login />;
 
   return <MainApp session={session} onLogout={clearSession} />;

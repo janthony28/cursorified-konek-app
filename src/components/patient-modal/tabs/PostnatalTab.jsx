@@ -80,7 +80,6 @@ export default function PostnatalTab({
                 <Paper withBorder p="xs">
                   <Text size="xs" fw={700} mb={5}>Completed IFA?</Text>
                   <Text size="sm" fw={500} c={isPostpartumIfaCompleted ? 'green' : 'dimmed'} mb="xs">{isPostpartumIfaCompleted ? 'Yes' : 'No'}</Text>
-                  <Text size="xs" c="dimmed" mb={4}>Completed date (auto — set when total hits 90)</Text>
                   <input type="date" disabled style={{ width: '100%', padding: '4px', border: '1px solid #ced4da', borderRadius: '4px', fontSize: '12px', backgroundColor: '#f1f3f5' }} value={formData.postpartum_ifa_completed_date || ''} />
                 </Paper>
               </Grid.Col>
@@ -88,7 +87,6 @@ export default function PostnatalTab({
                 <Paper withBorder p="xs">
                   <Text size="xs" fw={700} mb={5}>Completed Vit. A?</Text>
                   <Text size="sm" fw={500} c={isVitACompleted ? 'green' : 'dimmed'} mb="xs">{isVitACompleted ? 'Yes' : 'No'}</Text>
-                  <Text size="xs" c="dimmed" mb={4}>Date given (optional — Yes when date is set)</Text>
                   <input type="date" style={{ width: '100%', padding: '4px', border: '1px solid #ced4da', borderRadius: '4px', fontSize: '12px' }} value={formData.vit_a_completed_date || ''} onChange={(e) => setFormData({ ...formData, vit_a_completed_date: e.target.value })} />
                 </Paper>
               </Grid.Col>

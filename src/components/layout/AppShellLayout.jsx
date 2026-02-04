@@ -18,24 +18,29 @@ export default function AppShellLayout({
 }) {
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: 64 }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !mobileOpened, desktop: !desktopOpened } }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShell.Header
+        style={{
+          boxShadow: '0 2px 12px rgba(12, 166, 120, 0.08)',
+          borderBottom: '1px solid rgba(12, 166, 120, 0.12)',
+        }}
+      >
         <Group h="100%" px="md" justify="space-between">
-          <Group>
+          <Group gap="sm">
             <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
             <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-            <Stethoscope color="#0ca678" size={28} />
-            <Text fw={800} size="xl" variant="gradient" gradient={{ from: 'teal', to: 'lime', deg: 45 }}>KONEK Health</Text>
+            <Stethoscope color="#0ca678" size={28} strokeWidth={2} />
+            <Text fw={800} size="xl" variant="gradient" gradient={{ from: 'teal.7', to: 'teal.5', deg: 135 }}>KONEK Health</Text>
           </Group>
           <Group><Button variant="subtle" color="red" size="xs" leftSection={<LogOut size={14} />} onClick={handleLogout}>Logout</Button></Group>
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="md">
-        <Button fullWidth size="md" color="teal" leftSection={<Plus size={20} />} onClick={handleAddClick} mb="lg" style={{ boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }} disabled={modalOpened}>
+      <AppShell.Navbar p="md" style={{ borderRight: '1px solid rgba(12, 166, 120, 0.1)' }}>
+        <Button fullWidth size="md" color="teal" leftSection={<Plus size={20} />} onClick={handleAddClick} mb="lg" style={{ boxShadow: '0 4px 12px rgba(12, 166, 120, 0.25)' }} disabled={modalOpened}>
           Add New Record
         </Button>
 
@@ -48,7 +53,11 @@ export default function AppShellLayout({
         <NavLink label="Help Center" leftSection={<Info size={16} />} active={activePage === 'help'} onClick={() => handleNavClick('help')} variant="light" color="teal" />
       </AppShell.Navbar>
 
-      <AppShell.Main bg="#f8f9fa">
+      <AppShell.Main
+        style={{
+          background: 'linear-gradient(180deg, #f8fbfa 0%, #f0f4f8 100%)',
+        }}
+      >
         {children}
       </AppShell.Main>
     </AppShell>

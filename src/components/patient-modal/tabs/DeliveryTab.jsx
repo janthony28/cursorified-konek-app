@@ -72,6 +72,8 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
                       delivery_place: '',
                       delivery_facility_type: '',
                       delivery_place_specify: '',
+                      delivery_non_health_facility: '',
+                      delivery_non_health_place: '',
                       delivery_place_capable: '',
                       pregnancy_type: '',
                       pregnancy_multiple_count: '',
@@ -212,16 +214,23 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
         </Box>
         <Grid p="sm">
           <Grid.Col span={4}>
-            <Select disabled={isAborted} label="Place (Specific)" placeholder="Select Place..." data={['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary', 'Ambulance', 'Others']} value={formData.delivery_place || ''} onChange={(val) => setFormData({ ...formData, delivery_place: val })} />
+            <Select disabled={isAborted} label="Place" placeholder="Select Place..." data={['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary', 'Ambulance', 'Others']} value={formData.delivery_place || ''} onChange={(val) => setFormData({ ...formData, delivery_place: val, ...(val !== 'Others' ? { delivery_non_health_facility: '', delivery_non_health_place: '' } : {}) })} />
           </Grid.Col>
           <Grid.Col span={4}>
-            <Select disabled={isAborted} label="Facility Type" placeholder="Select Type..." data={['Public', 'Private', 'Non-Health Facility']} value={formData.delivery_facility_type || ''} onChange={(val) => setFormData({ ...formData, delivery_facility_type: val })} />
-            {formData.delivery_facility_type === 'Non-Health Facility' && (
-              <TextInput disabled={isAborted} mt="xs" placeholder="Specify (e.g. Home, En Route)" value={formData.delivery_place_specify || ''} onChange={(e) => setFormData({ ...formData, delivery_place_specify: e.target.value })} />
-            )}
+            <Select disabled={isAborted} label="Facility Type" placeholder="Select Type..." data={['Public', 'Private']} value={formData.delivery_facility_type || ''} onChange={(val) => setFormData({ ...formData, delivery_facility_type: val })} />
           </Grid.Col>
           <Grid.Col span={4}>
-            <Select disabled={isAborted} label="BEmONC/CEmONC Capable?" placeholder="--" data={['Yes', 'No']} value={formData.delivery_place_capable || ''} onChange={(val) => setFormData({ ...formData, delivery_place_capable: val })} />
+            <Stack gap="xs">
+              <Select disabled={isAborted} label="BEmONC/CEmONC Capable?" placeholder="--" data={['Yes', 'No']} value={formData.delivery_place_capable || ''} onChange={(val) => setFormData({ ...formData, delivery_place_capable: val })} />
+              {formData.delivery_place === 'Others' && (
+                <>
+                  <Select disabled={isAborted} label="Non-Health Facility" placeholder="Select..." data={['Home', 'Others']} value={formData.delivery_non_health_facility || ''} onChange={(val) => setFormData({ ...formData, delivery_non_health_facility: val || '', delivery_non_health_place: val === 'Others' ? (formData.delivery_non_health_place || '') : '' })} />
+                  {formData.delivery_non_health_facility === 'Others' && (
+                    <TextInput disabled={isAborted} placeholder="Please specify..." value={formData.delivery_non_health_place || ''} onChange={(e) => setFormData({ ...formData, delivery_non_health_place: e.target.value })} />
+                  )}
+                </>
+              )}
+            </Stack>
           </Grid.Col>
         </Grid>
       </Paper>

@@ -65,6 +65,7 @@ export function getInitialFormState() {
     delivery_facility_type: '',
     delivery_place: '',
     delivery_non_health_place: '',
+    delivery_non_health_facility: '',
     delivery_place_capable: '',
 
     pnc_date_1: '', pnc_date_2: '', pnc_date_3: '', pnc_date_4: '',

@@ -383,9 +383,6 @@ function MainApp({ session, onLogout }) {
 
   const handleEditClick = (patient) => {
     const attendant = parseOthers(patient.delivery_attendant);
-    let placeSpecify = '';
-    if (patient.delivery_facility_type === 'Non-Health Facility') placeSpecify = patient.delivery_non_health_place || '';
-
     const cleanData = {};
     Object.keys(initialFormState).forEach((key) => {
       if (patient[key] === null || patient[key] === undefined) cleanData[key] = initialFormState[key];
@@ -399,7 +396,6 @@ function MainApp({ session, onLogout }) {
       manual_risk: patient.is_high_risk,
       delivery_attendant: attendant.main,
       delivery_attendant_specify: attendant.specify,
-      delivery_place_specify: placeSpecify,
       prenatal_visits: patient.prenatal_visits || [],
       supplements_ifa: patient.supplements_ifa || [],
       supplements_calcium: patient.supplements_calcium || [],
@@ -493,8 +489,13 @@ function MainApp({ session, onLogout }) {
         ? formData.baby_details
         : [];
 
-      if (formData.delivery_facility_type === 'Non-Health Facility') rawPayload.delivery_non_health_place = formData.delivery_place_specify;
-      else rawPayload.delivery_non_health_place = null;
+      if (formData.delivery_place === 'Others') {
+        rawPayload.delivery_non_health_facility = formData.delivery_non_health_facility || null;
+        rawPayload.delivery_non_health_place = formData.delivery_non_health_facility === 'Others' ? (formData.delivery_non_health_place || null) : null;
+      } else {
+        rawPayload.delivery_non_health_facility = null;
+        rawPayload.delivery_non_health_place = null;
+      }
 
       const numberFields = ['age', 'gravida', 'parity', 'birth_weight', 'height', 'weight', 'bmi', 'postpartum_ifa_count', 'pregnancy_multiple_count'];
       const finalPayload = { ...rawPayload };

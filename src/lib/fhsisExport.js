@@ -134,7 +134,7 @@ export async function exportToExcel(patients, options = {}) {
         if (p.delivery_attendant === 'MW') inc('attendant_mw');
         if (p.delivery_facility_type === 'Public') inc('facility_public');
         if (p.delivery_facility_type === 'Private') inc('facility_private');
-        if (p.delivery_facility_type === 'Non-Health Facility') inc('non_facility');
+        if (p.delivery_place === 'Others') inc('non_facility');
         if (p.delivery_mode === 'VD') inc('del_vaginal');
         if (p.delivery_mode === 'CS') inc('del_cs');
         if (p.delivery_outcome === 'FT') inc('outcome_ft');

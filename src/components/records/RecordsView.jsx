@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Group, Paper, Stack, Table, Text, Title, Badge, Box, Button, TextInput, ActionIcon, Select, Grid, Checkbox } from '@mantine/core';
 import { UserPlus, Search, Edit, Trash, Filter } from 'lucide-react';
 import { formatDate } from '../../lib/formatters';
@@ -45,6 +45,20 @@ export default function RecordsView({
   const [recordBarangay, setRecordBarangay] = useState('');
   const [recordStatus, setRecordStatus] = useState(() => (filterStatus === 'high_risk' ? 'high_risk' : 'all'));
   const [dueForVisitOnly, setDueForVisitOnly] = useState(() => filterStatus === 'due');
+
+  // Sync local filter state when parent changes filterStatus (e.g. dashboard "Due for visit" → Records)
+  useEffect(() => {
+    if (filterStatus === 'due') {
+      setDueForVisitOnly(true);
+      setRecordStatus('all');
+    } else if (filterStatus === 'high_risk') {
+      setRecordStatus('high_risk');
+      setDueForVisitOnly(false);
+    } else if (filterStatus === 'all') {
+      setRecordStatus('all');
+      setDueForVisitOnly(false);
+    }
+  }, [filterStatus]);
 
   const safePatients = Array.isArray(patients) ? patients : [];
 

@@ -494,7 +494,8 @@ function MainApp({ session, onLogout }) {
     if (isInvalid(formData.gravida)) setError('gravida', 'general', 'Gravida is required');
     if (isInvalid(formData.parity)) setError('parity', 'general', 'Parity is required');
     const isAbortedCheck = formData.delivery_outcome === 'AB' || formData.delivery_outcome === 'FD';
-    if (!isAbortedCheck && isInvalid(formData.delivery_mode)) setError('delivery_mode', 'delivery', 'Delivery type is required');
+    const hasDelivered = !!(formData.delivery_outcome && String(formData.delivery_outcome).trim());
+    if (hasDelivered && !isAbortedCheck && isInvalid(formData.delivery_mode)) setError('delivery_mode', 'delivery', 'Delivery type is required');
 
     setFormErrors(newErrors);
     if (firstErrorTab) {

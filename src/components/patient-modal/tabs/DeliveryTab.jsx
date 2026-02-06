@@ -185,7 +185,7 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
               <Text size="sm" fw={700} c="blue.9" align="center">Delivery Type</Text>
             </Box>
             <Stack p="sm">
-              <Input.Wrapper error={formErrors?.delivery_mode} description={formErrors?.delivery_mode ? null : undefined}>
+              <Input.Wrapper error={formErrors?.delivery_mode} description={formErrors?.delivery_mode ? null : undefined} errorProps={{ mt: 'sm' }}>
                 <Stack gap="xs">
                   {[
                     { value: 'CS', label: 'CS - Cesarean Section' },

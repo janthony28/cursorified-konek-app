@@ -107,7 +107,7 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
         </Grid.Col>
 
         <Grid.Col span={4}>
-          <Paper withBorder radius="md" overflow="hidden" h="100%" style={{ opacity: isAborted ? 0.5 : 1 }}>
+          <Paper withBorder radius="md" overflow="hidden" h="100%" style={{ position: 'relative', zIndex: 1, opacity: isAborted ? 0.5 : 1 }}>
             <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
               <Text size="sm" fw={700} c="blue.9" align="center">
                 Baby Details
@@ -143,14 +143,24 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
                 readOnly
                 variant="filled"
               />
-              <Select
-                disabled={isAborted}
-                label="Sex of Baby"
-                placeholder="Select..."
-                data={['Male', 'Female']}
-                value={currentBaby.sex || ''}
-                onChange={(val) => handleBabySexChange(val, effectiveIndex)}
-              />
+              <Input.Wrapper label="Sex of Baby">
+                <Group mt="xs" gap="md">
+                  <Button
+                    variant={currentBaby.sex === 'Male' ? 'filled' : 'light'}
+                    disabled={isAborted}
+                    onClick={() => handleBabySexChange('Male', effectiveIndex)}
+                  >
+                    Male
+                  </Button>
+                  <Button
+                    variant={currentBaby.sex === 'Female' ? 'filled' : 'light'}
+                    disabled={isAborted}
+                    onClick={() => handleBabySexChange('Female', effectiveIndex)}
+                  >
+                    Female
+                  </Button>
+                </Group>
+              </Input.Wrapper>
             </Stack>
           </Paper>
         </Grid.Col>

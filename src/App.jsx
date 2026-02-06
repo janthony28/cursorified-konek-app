@@ -598,6 +598,7 @@ function MainApp({ session, onLogout }) {
         removePostpartumLog={removePostpartumLog}
         handlePncDateChange={handlePncDateChange}
         handleBirthWeightChange={handleBirthWeightChange}
+        handleBabySexChange={handleBabySexChange}
         totalIFA={totalIFA}
         totalMMS={totalMMS}
         ifaProgress={ifaProgress}

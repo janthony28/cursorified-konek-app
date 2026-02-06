@@ -1,5 +1,5 @@
 import { AppShell, Burger, Group, NavLink, Text, Button } from '@mantine/core';
-import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus, Copyright } from 'lucide-react';
 
 export default function AppShellLayout({
   mobileOpened,
@@ -87,8 +87,11 @@ export default function AppShellLayout({
         style={{ 
           borderRight: '1px solid rgba(12, 166, 120, 0.1)',
           background: 'rgba(255, 255, 255, 0.98)',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
+        <div style={{ flex: 1, minHeight: 0 }}>
         <Button 
           fullWidth 
           size="md" 
@@ -183,6 +186,18 @@ export default function AppShellLayout({
             fontWeight: activePage === 'help' ? 600 : 500,
           }}
         />
+        </div>
+        <Group gap={2} wrap="wrap" mt="auto" pt="sm" style={{ borderTop: '1px solid rgba(12, 166, 120, 0.1)' }}>
+          <Group gap={2} wrap="nowrap">
+            <Copyright size={10} style={{ color: 'var(--mantine-color-dimmed)' }} />
+            <Text size="xs" c="dimmed" fw={500} style={{ fontSize: '10px', lineHeight: 1.3 }}>
+              All rights reserved
+            </Text>
+          </Group>
+          <Text size="xs" c="dimmed" fw={600} style={{ fontSize: '10px', lineHeight: 1.3 }}>
+            PANALIGAN, AQUINO, BAUAN, CABRERA, PALBACAL, SEBUC
+          </Text>
+        </Group>
       </AppShell.Navbar>
 
       <AppShell.Main

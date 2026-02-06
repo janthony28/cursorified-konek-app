@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
-import { Container, Paper, Title, Text, TextInput, PasswordInput, Button, Group, Anchor, Stack, Box } from '@mantine/core';
+import { Container, Paper, Text, TextInput, PasswordInput, Button, Group, Anchor, Stack, Box } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { Stethoscope } from 'lucide-react';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -34,58 +33,132 @@ export default function Login() {
         justifyContent: 'center',
         background: 'linear-gradient(165deg, #e6fcf5 0%, #b2f2e2 30%, #f0f4f8 70%, #fff 100%)',
         padding: 24,
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
-      <Container size={420} style={{ flex: '0 1 auto' }}>
-        <Paper className="login-card-reveal" withBorder shadow="xl" p={30} radius="lg" style={{ borderColor: 'rgba(12, 166, 120, 0.2)' }}>
-        {/* LOGO SECTION [Source: PDF Page 2] */}
-        <Group justify="center" mb="md">
-          <Stethoscope size={64} color="#0ca678" strokeWidth={1.5} />
-        </Group>
-        
-        <Title align="center" order={2} mb="xs">
-          KONEK
-        </Title>
-        <Text c="dimmed" size="sm" ta="center" mb="xl">
-          Komunidad Network for Kalusugan
-        </Text>
-
-        <form onSubmit={handleLogin}>
-          <Stack>
-            <TextInput 
-              label="Email" 
-              placeholder="midwife@konek.ph" 
-              required 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+      {/* Decorative background elements */}
+      <Box
+        style={{
+          position: 'absolute',
+          top: '-50%',
+          right: '-20%',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.1) 0%, rgba(12, 166, 120, 0.05) 100%)',
+          filter: 'blur(60px)',
+          zIndex: 0,
+        }}
+      />
+      <Box
+        style={{
+          position: 'absolute',
+          bottom: '-30%',
+          left: '-15%',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.08) 0%, rgba(12, 166, 120, 0.03) 100%)',
+          filter: 'blur(50px)',
+          zIndex: 0,
+        }}
+      />
+      
+      <Container size={420} style={{ flex: '0 1 auto', position: 'relative', zIndex: 1 }}>
+        <Paper 
+          className="login-card-reveal" 
+          withBorder 
+          shadow="xl" 
+          p={40} 
+          radius="xl" 
+          style={{ 
+            borderColor: 'rgba(12, 166, 120, 0.2)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(12, 166, 120, 0.05)',
+          }}
+        >
+          {/* LOGO */}
+          <Group justify="center" mb="xl">
+            <img 
+              src="/konek-logo.png" 
+              alt="KONEK – KOmunidad NEtwork for Kalusugan" 
+              style={{ 
+                width: 180, 
+                height: 'auto',
+              }} 
             />
-            
-            <PasswordInput 
-              label="Password" 
-              placeholder="Your password" 
-              required 
-              mt="md"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          </Group>
 
-            <Group justify="space-between" mt="lg">
-              <Anchor component="button" size="sm" type="button">
-                Forgot password?
-              </Anchor>
-            </Group>
+          <form onSubmit={handleLogin}>
+            <Stack gap="md">
+              <TextInput 
+                label="Email" 
+                placeholder="midwife@konek.ph" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                size="md"
+                radius="md"
+                styles={{
+                  input: {
+                    transition: 'all 0.2s ease',
+                  }
+                }}
+              />
+              
+              <PasswordInput 
+                label="Password" 
+                placeholder="Your password" 
+                required 
+                mt="md"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                size="md"
+                radius="md"
+                styles={{
+                  input: {
+                    transition: 'all 0.2s ease',
+                  }
+                }}
+              />
 
-            <Button fullWidth mt="xl" color="teal" type="submit" loading={loading}>
-              Login
-            </Button>
-            
-            <Text c="dimmed" size="xs" ta="center" mt="md">
+              <Group justify="flex-end" mt="sm">
+                <Anchor 
+                  component="button" 
+                  size="sm" 
+                  type="button"
+                  style={{
+                    fontWeight: 500,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  Forgot password?
+                </Anchor>
+              </Group>
+
+              <Button 
+                fullWidth 
+                mt="xl" 
+                color="teal" 
+                type="submit" 
+                loading={loading}
+                size="md"
+                radius="md"
+                style={{
+                  fontWeight: 600,
+                  boxShadow: '0 4px 14px 0 rgba(12, 166, 120, 0.25)',
+                }}
+              >
+                Login
+              </Button>
+              
+              <Text c="dimmed" size="xs" ta="center" mt="md" style={{ lineHeight: 1.6 }}>
                 By clicking Login, you agree to our Terms of Use and Privacy Policy.
-            </Text>
-          </Stack>
-        </form>
-      </Paper>
-    </Container>
+              </Text>
+            </Stack>
+          </form>
+        </Paper>
+      </Container>
     </Box>
   );
 }

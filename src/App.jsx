@@ -8,13 +8,11 @@ import DashboardView from './components/dashboard/DashboardView';
 import RecordsView from './components/records/RecordsView';
 import ReportsView from './components/reports/ReportsView';
 import HelpView from './components/help/HelpView';
-import AccountsView from './components/accounts/AccountsView';
 import AppShellLayout from './components/layout/AppShellLayout';
 import PatientModal from './components/patient-modal/PatientModal';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { Box, Loader, Text } from '@mantine/core';
-import { Stethoscope } from 'lucide-react';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -37,13 +35,78 @@ function App() {
           justifyContent: 'center',
           alignItems: 'center',
           height: '100vh',
-          gap: 16,
+          gap: 24,
           background: 'linear-gradient(160deg, #e6fcf5 0%, #f0f4f8 50%, #fff 100%)',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <Stethoscope size={48} color="#0ca678" strokeWidth={1.5} style={{ opacity: 0.9 }} />
-        <Loader color="teal" type="dots" size="lg" />
-        <Text size="sm" c="dimmed" fw={500}>Loading KONEK Health…</Text>
+        {/* Animated background elements */}
+        <Box
+          style={{
+            position: 'absolute',
+            top: '-30%',
+            right: '-20%',
+            width: '500px',
+            height: '500px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.1) 0%, rgba(12, 166, 120, 0.05) 100%)',
+            filter: 'blur(60px)',
+            animation: 'pulse 3s ease-in-out infinite',
+          }}
+        />
+        <Box
+          style={{
+            position: 'absolute',
+            bottom: '-20%',
+            left: '-15%',
+            width: '400px',
+            height: '400px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.08) 0%, rgba(12, 166, 120, 0.03) 100%)',
+            filter: 'blur(50px)',
+            animation: 'pulse 3s ease-in-out infinite 1.5s',
+          }}
+        />
+        <img 
+          src="/konek-logo.png" 
+          alt="KONEK" 
+          style={{ 
+            height: 72, 
+            width: 'auto', 
+            position: 'relative',
+            zIndex: 1,
+            animation: 'fadeIn 0.6s ease-out',
+          }} 
+        />
+        <Loader 
+          color="teal" 
+          type="dots" 
+          size="lg"
+          style={{
+            position: 'relative',
+            zIndex: 1,
+          }}
+        />
+        <Text 
+          size="sm" 
+          c="dimmed" 
+          fw={600}
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            letterSpacing: '0.02em',
+            animation: 'fadeIn 0.8s ease-out',
+          }}
+        >
+          Loading KOmunidad NEtwork for Kalusugan…
+        </Text>
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+          }
+        `}</style>
       </Box>
     );
   }
@@ -628,8 +691,7 @@ function MainApp({ session, onLogout }) {
     activePage === 'dashboard' ? <DashboardView patients={patients} currentTime={currentTime} handleAddClick={handleAddClick} onFilterSelect={handleFilterSelect} /> :
       activePage === 'records' ? <RecordsView patients={patients} search={search} setSearch={setSearch} handleAddClick={handleAddClick} handleEditClick={handleEditClick} handleDelete={handleDelete} isAdmin={isAdmin} getAgeGroup={getAgeGroup} filterStatus={filterStatus} setFilterStatus={setFilterStatus} modalOpened={opened} /> :
         activePage === 'reports' ? <ReportsView patients={patients} /> :
-          activePage === 'help' ? <HelpView /> :
-            activePage === 'accounts' ? <AccountsView /> : null;
+          activePage === 'help' ? <HelpView /> : null;
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Group, Paper, Stack, Table, Text, Title, Badge, Box, Button, TextInput, ActionIcon, Select, Grid, Checkbox } from '@mantine/core';
+import { Group, Paper, Stack, Table, Text, Title, Badge, Box, Button, TextInput, ActionIcon, Select, Grid, Checkbox, ThemeIcon } from '@mantine/core';
 import { UserPlus, Search, Edit, Trash, Filter } from 'lucide-react';
 import { formatDate } from '../../lib/formatters';
 import { isPatientDue, getLatestPrenatalVisit } from '../../lib/patientHelpers';
@@ -105,16 +105,40 @@ export default function RecordsView({
   };
 
   return (
-    <Stack>
-      <Group justify="space-between">
-        <Title order={3}>{viewTitle}</Title>
-        <Button leftSection={<UserPlus size={16} />} color="teal" onClick={handleAddClick} disabled={modalOpened}>Add New Record</Button>
+    <Stack gap="lg">
+      <Group justify="space-between" wrap="wrap">
+        <Title order={3} fw={800} style={{ letterSpacing: '-0.02em' }}>{viewTitle}</Title>
+        <Button 
+          leftSection={<UserPlus size={18} />} 
+          color="teal" 
+          onClick={handleAddClick} 
+          disabled={modalOpened}
+          size="md"
+          radius="md"
+          style={{
+            fontWeight: 600,
+            boxShadow: '0 4px 14px 0 rgba(12, 166, 120, 0.25)',
+          }}
+        >
+          Add New Record
+        </Button>
       </Group>
 
-      <Paper shadow="sm" p="md" radius="md" withBorder>
+      <Paper 
+        shadow="md" 
+        p="lg" 
+        radius="lg" 
+        withBorder
+        style={{
+          border: '1px solid rgba(0, 0, 0, 0.08)',
+          background: 'white',
+        }}
+      >
         <Group mb="md" gap="xs">
-          <Filter size={16} />
-          <Text size="sm" fw={600}>Filters</Text>
+          <ThemeIcon color="teal" variant="light" size="md" radius="md">
+            <Filter size={18} />
+          </ThemeIcon>
+          <Text size="sm" fw={700} style={{ letterSpacing: '0.05em' }}>FILTERS</Text>
         </Group>
         <Grid gutter="xs" mb="sm">
           <Grid.Col span={{ base: 12, xs: 6, sm: 2 }}>
@@ -161,11 +185,29 @@ export default function RecordsView({
           </Group>
         )}
 
-        <TextInput leftSection={<Search size={16} />} placeholder="Search by name..." mb="sm" value={search} onChange={(e) => setSearch(e.target.value)} size="sm" />
-        <Box style={{ overflowX: 'auto' }}>
-          <Table striped highlightOnHover verticalSpacing="sm">
-            <Table.Thead bg="gray.1">
-              <Table.Tr><Table.Th>Name</Table.Th><Table.Th>Age Group</Table.Th><Table.Th>Barangay</Table.Th><Table.Th>Last Visit</Table.Th><Table.Th>Status</Table.Th><Table.Th>Action</Table.Th></Table.Tr>
+        <TextInput 
+          leftSection={<Search size={18} />} 
+          placeholder="Search by name..." 
+          mb="md" 
+          value={search} 
+          onChange={(e) => setSearch(e.target.value)} 
+          size="md"
+          radius="md"
+          style={{
+            transition: 'all 0.2s ease',
+          }}
+        />
+        <Box style={{ overflowX: 'auto', borderRadius: '8px' }}>
+          <Table striped highlightOnHover verticalSpacing="md">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Age Group</Table.Th>
+                <Table.Th>Barangay</Table.Th>
+                <Table.Th>Last Visit</Table.Th>
+                <Table.Th>Status</Table.Th>
+                <Table.Th>Action</Table.Th>
+              </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {filtered.map((p) => {
@@ -175,8 +217,20 @@ export default function RecordsView({
                 const isDue = isPatientDue(p, now.getMonth(), now.getFullYear());
                 const statusBadges = (
                   <Group gap={6} wrap="wrap">
-                    {p.is_high_risk ? <Badge size="sm" color="red">High Risk</Badge> : <Badge size="sm" color="green">Normal</Badge>}
-                    {isDue && <Badge size="sm" color="orange">Due/Overdue</Badge>}
+                    {p.is_high_risk ? (
+                      <Badge size="sm" color="red" variant="light" radius="md" style={{ fontWeight: 600 }}>
+                        High Risk
+                      </Badge>
+                    ) : (
+                      <Badge size="sm" color="green" variant="light" radius="md" style={{ fontWeight: 600 }}>
+                        Normal
+                      </Badge>
+                    )}
+                    {isDue && (
+                      <Badge size="sm" color="orange" variant="light" radius="md" style={{ fontWeight: 600 }}>
+                        Due/Overdue
+                      </Badge>
+                    )}
                   </Group>
                 );
                 return (
@@ -187,19 +241,43 @@ export default function RecordsView({
                     <Table.Td c="dimmed">{lastVisit}</Table.Td>
                     <Table.Td>{statusBadges}</Table.Td>
                     <Table.Td>
-                      <Group gap={5}>
-                        <ActionIcon color="blue" variant="light" onClick={() => handleEditClick(p)}>
-                          <Edit size={16} />
+                      <Group gap={6}>
+                        <ActionIcon 
+                          color="blue" 
+                          variant="light" 
+                          onClick={() => handleEditClick(p)}
+                          size="lg"
+                          radius="md"
+                          style={{
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <Edit size={18} />
                         </ActionIcon>
-                        <ActionIcon color="red" variant="light" onClick={() => handleDelete(p)}>
-                          <Trash size={16} />
+                        <ActionIcon 
+                          color="red" 
+                          variant="light" 
+                          onClick={() => handleDelete(p)}
+                          size="lg"
+                          radius="md"
+                          style={{
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <Trash size={18} />
                         </ActionIcon>
                       </Group>
                     </Table.Td>
                   </Table.Tr>
                 );
               })}
-              {filtered.length === 0 && <Table.Tr><Table.Td colSpan={6} align="center">No records found</Table.Td></Table.Tr>}
+              {filtered.length === 0 && (
+                <Table.Tr>
+                  <Table.Td colSpan={6} align="center" py="xl">
+                    <Text c="dimmed" size="sm">No records found</Text>
+                  </Table.Td>
+                </Table.Tr>
+              )}
             </Table.Tbody>
           </Table>
         </Box>

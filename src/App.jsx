@@ -77,6 +77,10 @@ function MainApp({ session, onLogout }) {
   const [newSupp, setNewSupp] = useState({ type: 'IFA', date: '', count: '' });
   const [newLab, setNewLab] = useState({ type: 'CBC', date: '', result: '' });
   const [newPostpartumLog, setNewPostpartumLog] = useState({ date: '', count: '', remarks: '' });
+  const [editingVisitIndex, setEditingVisitIndex] = useState(null);
+  const [editingSupp, setEditingSupp] = useState(null); // { type: 'IFA'|'MMS', index }
+  const [editingLabIndex, setEditingLabIndex] = useState(null);
+  const [editingPostpartumIndex, setEditingPostpartumIndex] = useState(null);
 
   useEffect(() => { const t = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(t); }, []);
   useEffect(() => { fetchPatients(); }, []);
@@ -258,65 +262,124 @@ function MainApp({ session, onLogout }) {
   };
 
   const addVisitToList = () => {
-    if (!newVisit.date || !newVisit.weight) return notifications.show({ title: 'Required', message: 'Please enter visit date and weight.', color: 'red' });
-    const latest = getLatestPrenatalVisit(formData.prenatal_visits);
+    if (!newVisit.date) return notifications.show({ title: 'Required', message: 'Please enter visit date.', color: 'red' });
+    if (newVisit.trimester === '1st Trimester' && (newVisit.weight === '' || newVisit.weight == null)) return notifications.show({ title: 'Required', message: 'Weight is required for 1st trimester visits.', color: 'red' });
+    const otherVisits = editingVisitIndex != null ? formData.prenatal_visits.filter((_, idx) => idx !== editingVisitIndex) : formData.prenatal_visits;
+    const latest = getLatestPrenatalVisit(otherVisits);
     if (latest?.date && newVisit.date <= latest.date) {
       notifications.show({ title: 'Invalid date', message: `Visit date must be after the latest visit (${formatDate(latest.date)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
       return;
     }
-    setFormData({ ...formData, prenatal_visits: [...formData.prenatal_visits, newVisit] });
+    if (editingVisitIndex != null) {
+      const next = [...formData.prenatal_visits];
+      next[editingVisitIndex] = newVisit;
+      setFormData({ ...formData, prenatal_visits: next });
+      setEditingVisitIndex(null);
+    } else {
+      setFormData({ ...formData, prenatal_visits: [...formData.prenatal_visits, newVisit] });
+    }
     setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
   };
-  const removeVisit = (i) => setFormData({ ...formData, prenatal_visits: formData.prenatal_visits.filter((_, idx) => idx !== i) });
+  const removeVisit = (i) => {
+    setFormData({ ...formData, prenatal_visits: formData.prenatal_visits.filter((_, idx) => idx !== i) });
+    if (editingVisitIndex === i) { setEditingVisitIndex(null); setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' }); }
+  };
+  const startEditVisit = (i) => {
+    const v = formData.prenatal_visits[i] || {};
+    setNewVisit({ date: v.date || '', aog: v.aog || '', trimester: v.trimester || '', weight: v.weight || '', height: v.height || '', bmi: v.bmi || '', bmi_category: v.bmi_category || '', remarks: v.remarks || '' });
+    setEditingVisitIndex(i);
+  };
 
   const addSupplement = () => {
     if (!newSupp.date || !newSupp.count) return notifications.show({ title: 'Required', message: 'Please enter date and count.', color: 'red' });
     const list = newSupp.type === 'IFA' ? formData.supplements_ifa : newSupp.type === 'Calcium' ? formData.supplements_calcium : formData.supplements_mms;
-    const latestDate = list.length ? list.reduce((max, item) => (item.date > max ? item.date : max), list[0].date) : null;
+    const otherList = editingSupp != null && editingSupp.type === newSupp.type ? list.filter((_, i) => i !== editingSupp.index) : list;
+    const latestDate = otherList.length ? otherList.reduce((max, item) => (item.date > max ? item.date : max), otherList[0].date) : null;
     if (latestDate && newSupp.date <= latestDate) {
       const label = newSupp.type === 'IFA' ? 'IFA' : newSupp.type === 'Calcium' ? 'Calcium' : 'MMS';
       notifications.show({ title: 'Invalid date', message: `${label} log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
       return;
     }
     const entry = { date: newSupp.date, count: newSupp.count };
-    if (newSupp.type === 'IFA') setFormData({ ...formData, supplements_ifa: [...formData.supplements_ifa, entry] });
-    else if (newSupp.type === 'Calcium') setFormData({ ...formData, supplements_calcium: [...formData.supplements_calcium, entry] });
-    else setFormData({ ...formData, supplements_mms: [...formData.supplements_mms, entry] });
+    if (editingSupp != null && editingSupp.type === newSupp.type) {
+      const arr = [...list];
+      arr[editingSupp.index] = entry;
+      if (newSupp.type === 'IFA') setFormData({ ...formData, supplements_ifa: arr });
+      else if (newSupp.type === 'Calcium') setFormData({ ...formData, supplements_calcium: arr });
+      else setFormData({ ...formData, supplements_mms: arr });
+      setEditingSupp(null);
+    } else {
+      if (newSupp.type === 'IFA') setFormData({ ...formData, supplements_ifa: [...formData.supplements_ifa, entry] });
+      else if (newSupp.type === 'Calcium') setFormData({ ...formData, supplements_calcium: [...formData.supplements_calcium, entry] });
+      else setFormData({ ...formData, supplements_mms: [...formData.supplements_mms, entry] });
+    }
     setNewSupp({ ...newSupp, date: '', count: '' });
   };
   const removeSupplement = (type, index) => {
     if (type === 'IFA') setFormData({ ...formData, supplements_ifa: formData.supplements_ifa.filter((_, i) => i !== index) });
     else if (type === 'Calcium') setFormData({ ...formData, supplements_calcium: formData.supplements_calcium.filter((_, i) => i !== index) });
     else setFormData({ ...formData, supplements_mms: formData.supplements_mms.filter((_, i) => i !== index) });
+    if (editingSupp?.type === type && editingSupp?.index === index) { setEditingSupp(null); setNewSupp({ ...newSupp, date: '', count: '' }); }
+  };
+  const startEditSupplement = (type, index) => {
+    const list = type === 'IFA' ? formData.supplements_ifa : type === 'MMS' ? formData.supplements_mms : formData.supplements_calcium;
+    const s = list[index] || {};
+    setNewSupp({ type, date: s.date || '', count: s.count ?? '' });
+    setEditingSupp({ type, index });
   };
 
   const addLabLog = () => {
     if (!newLab.date) return notifications.show({ title: 'Required', message: 'Date is required.', color: 'red' });
     if (!newLab.result) return notifications.show({ title: 'Required', message: 'Result is required.', color: 'red' });
-    setFormData({ ...formData, lab_logs: [...(formData.lab_logs || []), newLab] });
-    setNewLab({ ...newLab, date: '', result: '' });
+    const logs = formData.lab_logs || [];
+    if (editingLabIndex != null) {
+      const next = [...logs];
+      next[editingLabIndex] = newLab;
+      setFormData({ ...formData, lab_logs: next });
+      setEditingLabIndex(null);
+    } else {
+      setFormData({ ...formData, lab_logs: [...logs, newLab] });
+    }
+    setNewLab({ type: newLab.type, date: '', result: '' });
   };
-  const removeLabLog = (index) => setFormData({ ...formData, lab_logs: formData.lab_logs.filter((_, i) => i !== index) });
+  const removeLabLog = (index) => {
+    setFormData({ ...formData, lab_logs: formData.lab_logs.filter((_, i) => i !== index) });
+    if (editingLabIndex === index) { setEditingLabIndex(null); setNewLab({ type: newLab.type, date: '', result: '' }); }
+  };
+  const startEditLabLog = (index) => {
+    const log = (formData.lab_logs || [])[index] || {};
+    setNewLab({ type: log.type || 'CBC', date: log.date || '', result: log.result || '' });
+    setEditingLabIndex(index);
+  };
+
+  const getIfaCompletionDate = (logList) => {
+    const sorted = [...(logList || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
+    let running = 0;
+    for (const item of sorted) {
+      running += Number(item?.count) || 0;
+      if (running >= 90) return item?.date || '';
+    }
+    return '';
+  };
 
   const addPostpartumLog = () => {
     if (!newPostpartumLog.date || !newPostpartumLog.count) return notifications.show({ title: 'Required', message: 'Date and count are required.', color: 'red' });
     const logs = formData.postpartum_logs || [];
-    const latestDate = logs.length ? logs.reduce((max, item) => (item.date > max ? item.date : max), logs[0].date) : null;
+    const otherLogs = editingPostpartumIndex != null ? logs.filter((_, i) => i !== editingPostpartumIndex) : logs;
+    const latestDate = otherLogs.length ? otherLogs.reduce((max, item) => (item.date > max ? item.date : max), otherLogs[0].date) : null;
     if (latestDate && newPostpartumLog.date <= latestDate) {
       notifications.show({ title: 'Invalid date', message: `Postpartum log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
       return;
     }
-    const getIfaCompletionDate = (logList) => {
-      const sorted = [...(logList || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
-      let running = 0;
-      for (const item of sorted) {
-        running += Number(item?.count) || 0;
-        if (running >= 90) return item?.date || '';
-      }
-      return '';
-    };
 
-    const updatedLogs = [...logs, newPostpartumLog];
+    let updatedLogs;
+    if (editingPostpartumIndex != null) {
+      updatedLogs = [...logs];
+      updatedLogs[editingPostpartumIndex] = newPostpartumLog;
+      setEditingPostpartumIndex(null);
+    } else {
+      updatedLogs = [...logs, newPostpartumLog];
+    }
     const completionDate = getIfaCompletionDate(updatedLogs);
     setFormData({
       ...formData,
@@ -326,16 +389,6 @@ function MainApp({ session, onLogout }) {
     setNewPostpartumLog({ date: '', count: '', remarks: '' });
   };
   const removePostpartumLog = (index) => {
-    const getIfaCompletionDate = (logList) => {
-      const sorted = [...(logList || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
-      let running = 0;
-      for (const item of sorted) {
-        running += Number(item?.count) || 0;
-        if (running >= 90) return item?.date || '';
-      }
-      return '';
-    };
-
     const updatedLogs = (formData.postpartum_logs || []).filter((_, i) => i !== index);
     const completionDate = getIfaCompletionDate(updatedLogs);
     setFormData({
@@ -343,6 +396,12 @@ function MainApp({ session, onLogout }) {
       postpartum_logs: updatedLogs,
       postpartum_ifa_completed_date: completionDate || null,
     });
+    if (editingPostpartumIndex === index) { setEditingPostpartumIndex(null); setNewPostpartumLog({ date: '', count: '', remarks: '' }); }
+  };
+  const startEditPostpartumLog = (index) => {
+    const log = (formData.postpartum_logs || [])[index] || {};
+    setNewPostpartumLog({ date: log.date || '', count: log.count ?? '', remarks: log.remarks || '' });
+    setEditingPostpartumIndex(index);
   };
 
   const handlePncDateChange = (field, value) => {
@@ -378,6 +437,10 @@ function MainApp({ session, onLogout }) {
     setIsEditing(false);
     setEditId(null);
     setActiveTab('general');
+    setEditingVisitIndex(null);
+    setEditingSupp(null);
+    setEditingLabIndex(null);
+    setEditingPostpartumIndex(null);
     open();
   };
 
@@ -407,6 +470,10 @@ function MainApp({ session, onLogout }) {
     setIsEditing(true);
     setEditId(patient.id);
     setActiveTab('general');
+    setEditingVisitIndex(null);
+    setEditingSupp(null);
+    setEditingLabIndex(null);
+    setEditingPostpartumIndex(null);
     open();
   };
 
@@ -519,6 +586,10 @@ function MainApp({ session, onLogout }) {
         setFormData(getInitialFormState());
         setIsEditing(false);
         setEditId(null);
+        setEditingVisitIndex(null);
+        setEditingSupp(null);
+        setEditingLabIndex(null);
+        setEditingPostpartumIndex(null);
         fetchPatients();
       } else {
         notifications.show({ title: 'Error', message: error.message, color: 'red' });
@@ -590,12 +661,20 @@ function MainApp({ session, onLogout }) {
         handleBMIChange={handleBMIChange}
         addVisitToList={addVisitToList}
         removeVisit={removeVisit}
+        editingVisitIndex={editingVisitIndex}
+        startEditVisit={startEditVisit}
         addSupplement={addSupplement}
         removeSupplement={removeSupplement}
+        editingSupp={editingSupp}
+        startEditSupplement={startEditSupplement}
         addLabLog={addLabLog}
         removeLabLog={removeLabLog}
+        editingLabIndex={editingLabIndex}
+        startEditLabLog={startEditLabLog}
         addPostpartumLog={addPostpartumLog}
         removePostpartumLog={removePostpartumLog}
+        editingPostpartumIndex={editingPostpartumIndex}
+        startEditPostpartumLog={startEditPostpartumLog}
         handlePncDateChange={handlePncDateChange}
         handleBirthWeightChange={handleBirthWeightChange}
         handleBabySexChange={handleBabySexChange}

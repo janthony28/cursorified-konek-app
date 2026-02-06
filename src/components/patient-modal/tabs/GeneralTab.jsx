@@ -1,4 +1,4 @@
-import { Paper, Box, Grid, TextInput, Input, NumberInput, Select, Checkbox, Stack, Group, Text, Button, Badge, Radio } from '@mantine/core';
+import { Paper, Box, Grid, TextInput, Input, NumberInput, Select, Checkbox, Stack, Group, Text, Button, Badge } from '@mantine/core';
 import { ArrowRight } from 'lucide-react';
 import { BATANGAS_BARANGAYS } from '../../../lib/constants';
 
@@ -41,9 +41,9 @@ export default function GeneralTab({ formData, setFormData, formErrors, getAgeGr
             {formData.manual_risk && <Badge color="red" variant="filled">HIGH RISK</Badge>}
           </Group>
         </Box>
-        <Stack p="sm">
+        <Stack p="sm" gap="xs">
           <Checkbox
-            label="Is this patient High Risk?"
+            label="Is this person high risk?"
             checked={formData.manual_risk || false}
             onChange={(e) => {
               const checked = e.currentTarget.checked;
@@ -55,9 +55,11 @@ export default function GeneralTab({ formData, setFormData, formErrors, getAgeGr
                   : {
                     has_hypertension: false,
                     has_gestational_diabetes: false,
+                    has_advanced_maternal_age: false,
+                    has_multiple_gestation: false,
+                    has_multiple_miscarriages: false,
+                    has_obesity: false,
                     high_risk_reason: '',
-                    // Calcium carbonate supplementation is only applicable for high-risk patients.
-                    // Keep storage in `supplements_calcium` (JSON) so it maps cleanly to existing export logic.
                     supplements_calcium: [],
                     calcium_carbonate_completed: false,
                   }),
@@ -68,31 +70,33 @@ export default function GeneralTab({ formData, setFormData, formErrors, getAgeGr
           />
           {formData.manual_risk && (
             <Stack gap="xs">
-              <Radio.Group
-                label="High risk reason"
-                value={
-                  formData.has_hypertension ? 'hypertension' : formData.has_gestational_diabetes ? 'gestational_diabetes' : 'others'
-                }
-                onChange={(value) => {
-                  if (value === 'hypertension') setFormData({ ...formData, has_hypertension: true, has_gestational_diabetes: false, high_risk_reason: '' });
-                  else if (value === 'gestational_diabetes') setFormData({ ...formData, has_hypertension: false, has_gestational_diabetes: true, high_risk_reason: '' });
-                  else setFormData({ ...formData, has_hypertension: false, has_gestational_diabetes: false });
-                }}
-              >
-                <Stack mt="xs" gap="xs">
-                  <Radio value="hypertension" label="Hypertension" color="red" />
-                  <Radio value="gestational_diabetes" label="Gestational Diabetes" color="red" />
-                  <Radio value="others" label="Others" color="red" />
-                </Stack>
-              </Radio.Group>
-              {(formData.has_hypertension ? false : !formData.has_gestational_diabetes) && (
-                <TextInput
-                  label="Specify reason (Others)"
-                  placeholder="e.g., Age, History of C-Section..."
-                  value={formData.high_risk_reason || ''}
-                  onChange={(e) => setFormData({ ...formData, high_risk_reason: e.target.value })}
+              <Text size="sm" fw={500} c="dimmed">Select all that apply:</Text>
+              {[
+                { key: 'has_hypertension', label: 'Hypertension' },
+                { key: 'has_gestational_diabetes', label: 'Gestational diabetes' },
+                { key: 'has_advanced_maternal_age', label: 'Advanced maternal age' },
+                { key: 'has_multiple_gestation', label: 'Multiple gestation (twins, etc.)' },
+                { key: 'has_multiple_miscarriages', label: 'Multiple miscarriages' },
+                { key: 'has_obesity', label: 'Obesity' },
+              ].map(({ key, label }) => (
+                <Checkbox
+                  key={key}
+                  label={label}
+                  checked={!!formData[key]}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setFormData({ ...formData, [key]: checked });
+                  }}
+                  color="red"
+                  size="md"
                 />
-              )}
+              ))}
+              <TextInput
+                label="Other reason (optional)"
+                placeholder="e.g., History of C-Section..."
+                value={formData.high_risk_reason || ''}
+                onChange={(e) => setFormData({ ...formData, high_risk_reason: e.target.value })}
+              />
             </Stack>
           )}
         </Stack>

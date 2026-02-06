@@ -1,5 +1,5 @@
 import { Paper, Box, Stack, Group, Grid, Input, NumberInput, Button, ActionIcon, Text, Progress, Divider, Checkbox, Badge } from '@mantine/core';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X, Pencil } from 'lucide-react';
 import { formatDate } from '../../../lib/formatters';
 
 export default function SupplementationTab({
@@ -9,6 +9,8 @@ export default function SupplementationTab({
   setNewSupp,
   addSupplement,
   removeSupplement,
+  editingSupp,
+  startEditSupplement,
   totalIFA,
   totalMMS,
   ifaProgress,
@@ -45,9 +47,9 @@ export default function SupplementationTab({
               {totalIFA >= 180 && <Badge color="green">COMPLETED</Badge>}
               <Divider />
               <Group grow><Input type="date" value={newSupp.type === 'IFA' ? newSupp.date : ''} onChange={(e) => setNewSupp({ ...newSupp, type: 'IFA', date: e.target.value })} /> <NumberInput placeholder="Tabs" value={newSupp.type === 'IFA' ? newSupp.count : ''} onChange={(v) => setNewSupp({ ...newSupp, type: 'IFA', count: v })} /></Group>
-              <Button size="xs" variant="light" onClick={addSupplement}>+ Add Log</Button>
+              <Button size="xs" variant="light" onClick={addSupplement}>{editingSupp?.type === 'IFA' ? 'Update Log' : '+ Add Log'}</Button>
               <Stack gap={4}>
-                {formData.supplements_ifa.map((s, i) => <Group key={i} justify="space-between"><Text size="xs">{formatDate(s.date)}: {s.count} tabs</Text><ActionIcon size="sm" color="red" onClick={(e) => { e.stopPropagation(); removeSupplement('IFA', i); }}><X size={14} /></ActionIcon></Group>)}
+                {formData.supplements_ifa.map((s, i) => <Group key={i} justify="space-between"><Text size="xs">{formatDate(s.date)}: {s.count} tabs</Text><Group gap={4}><ActionIcon size="sm" color="blue" variant="light" onClick={(e) => { e.stopPropagation(); startEditSupplement('IFA', i); }} title="Edit"><Pencil size={14} /></ActionIcon><ActionIcon size="sm" color="red" onClick={(e) => { e.stopPropagation(); removeSupplement('IFA', i); }} title="Delete"><X size={14} /></ActionIcon></Group></Group>)}
               </Stack>
             </Stack>
           </Paper>
@@ -58,9 +60,9 @@ export default function SupplementationTab({
             <Box bg={totalIFA > 0 ? 'gray.1' : 'teal.0'} p="xs" style={{ borderBottom: '1px solid #eee' }}><Text fw={700} size="sm" c="teal.9">MMS (Micronutrients)</Text></Box>
             <Stack p="sm">
               <Group grow><Input type="date" value={newSupp.type === 'MMS' ? newSupp.date : ''} onChange={(e) => setNewSupp({ ...newSupp, type: 'MMS', date: e.target.value })} /> <NumberInput placeholder="Tabs" value={newSupp.type === 'MMS' ? newSupp.count : ''} onChange={(v) => setNewSupp({ ...newSupp, type: 'MMS', count: v })} /></Group>
-              <Button size="xs" variant="light" color="teal" onClick={addSupplement}>+ Add Log</Button>
+              <Button size="xs" variant="light" color="teal" onClick={addSupplement}>{editingSupp?.type === 'MMS' ? 'Update Log' : '+ Add Log'}</Button>
               <Stack gap={4}>
-                {formData.supplements_mms.map((s, i) => <Group key={i} justify="space-between"><Text size="xs">{formatDate(s.date)}: {s.count} tabs</Text><ActionIcon size="sm" color="red" onClick={(e) => { e.stopPropagation(); removeSupplement('MMS', i); }}><X size={14} /></ActionIcon></Group>)}
+                {formData.supplements_mms.map((s, i) => <Group key={i} justify="space-between"><Text size="xs">{formatDate(s.date)}: {s.count} tabs</Text><Group gap={4}><ActionIcon size="sm" color="blue" variant="light" onClick={(e) => { e.stopPropagation(); startEditSupplement('MMS', i); }} title="Edit"><Pencil size={14} /></ActionIcon><ActionIcon size="sm" color="red" onClick={(e) => { e.stopPropagation(); removeSupplement('MMS', i); }} title="Delete"><X size={14} /></ActionIcon></Group></Group>)}
               </Stack>
             </Stack>
           </Paper>

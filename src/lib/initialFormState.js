@@ -43,6 +43,10 @@ export function getInitialFormState() {
 
     has_hypertension: false,
     has_gestational_diabetes: false,
+    has_advanced_maternal_age: false,
+    has_multiple_gestation: false,
+    has_multiple_miscarriages: false,
+    has_obesity: false,
     manual_risk: false,
     is_high_risk: false,
     high_risk_reason: '',

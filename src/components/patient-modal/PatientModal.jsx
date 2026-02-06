@@ -36,12 +36,20 @@ export default function PatientModal({
   handleBMIChange,
   addVisitToList,
   removeVisit,
+  editingVisitIndex,
+  startEditVisit,
   addSupplement,
   removeSupplement,
+  editingSupp,
+  startEditSupplement,
   addLabLog,
   removeLabLog,
+  editingLabIndex,
+  startEditLabLog,
   addPostpartumLog,
   removePostpartumLog,
+  editingPostpartumIndex,
+  startEditPostpartumLog,
   handlePncDateChange,
   handleBirthWeightChange,
   handleBabySexChange,
@@ -70,7 +78,7 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="prenatal">
-          <PrenatalTab formData={formData} setFormData={setFormData} newVisit={newVisit} setNewVisit={setNewVisit} handleVisitDateChange={handleVisitDateChange} handleBMIChange={handleBMIChange} addVisitToList={addVisitToList} removeVisit={removeVisit} nextTab={nextTab} />
+          <PrenatalTab formData={formData} setFormData={setFormData} newVisit={newVisit} setNewVisit={setNewVisit} handleVisitDateChange={handleVisitDateChange} handleBMIChange={handleBMIChange} addVisitToList={addVisitToList} removeVisit={removeVisit} editingVisitIndex={editingVisitIndex} startEditVisit={startEditVisit} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="immunization">
@@ -78,11 +86,11 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="supplementation">
-          <SupplementationTab formData={formData} setFormData={setFormData} newSupp={newSupp} setNewSupp={setNewSupp} addSupplement={addSupplement} removeSupplement={removeSupplement} totalIFA={totalIFA} totalMMS={totalMMS} ifaProgress={ifaProgress} nextTab={nextTab} />
+          <SupplementationTab formData={formData} setFormData={setFormData} newSupp={newSupp} setNewSupp={setNewSupp} addSupplement={addSupplement} removeSupplement={removeSupplement} editingSupp={editingSupp} startEditSupplement={startEditSupplement} totalIFA={totalIFA} totalMMS={totalMMS} ifaProgress={ifaProgress} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="labs">
-          <LabsTab formData={formData} setFormData={setFormData} newLab={newLab} setNewLab={setNewLab} addLabLog={addLabLog} removeLabLog={removeLabLog} nextTab={nextTab} />
+          <LabsTab formData={formData} setFormData={setFormData} newLab={newLab} setNewLab={setNewLab} addLabLog={addLabLog} removeLabLog={removeLabLog} editingLabIndex={editingLabIndex} startEditLabLog={startEditLabLog} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="delivery">
@@ -98,7 +106,7 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="postnatal">
-          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} handlePncDateChange={handlePncDateChange} postpartumProgress={postpartumProgress} />
+          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} editingPostpartumIndex={editingPostpartumIndex} startEditPostpartumLog={startEditPostpartumLog} handlePncDateChange={handlePncDateChange} postpartumProgress={postpartumProgress} />
         </Tabs.Panel>
       </Tabs>
       <Button fullWidth mt="lg" onClick={handleSubmit} color={formData.manual_risk ? 'red' : 'teal'} size="md" loading={submitting} disabled={submitting}>

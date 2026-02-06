@@ -1,8 +1,8 @@
 import { Paper, Box, Stack, Group, Input, Select, Button, Table, ActionIcon, Text, Badge } from '@mantine/core';
-import { ArrowRight, Plus, Trash } from 'lucide-react';
+import { ArrowRight, Plus, Trash, Pencil } from 'lucide-react';
 import { formatDate } from '../../../lib/formatters';
 
-export default function LabsTab({ formData, setFormData, newLab, setNewLab, addLabLog, removeLabLog, nextTab }) {
+export default function LabsTab({ formData, setFormData, newLab, setNewLab, addLabLog, removeLabLog, editingLabIndex, startEditLabLog, nextTab }) {
   return (
     <>
       <Paper withBorder radius="md" overflow="hidden">
@@ -25,7 +25,7 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
               value={newLab.result || null}
               onChange={(v) => setNewLab({ ...newLab, result: v ?? '' })}
             />
-            <Button onClick={addLabLog} leftSection={<Plus size={16} />}>Add Result</Button>
+            <Button onClick={addLabLog} leftSection={<Plus size={16} />}>{editingLabIndex != null ? 'Update Result' : 'Add Result'}</Button>
           </Group>
           <Table striped withTableBorder>
             <Table.Thead><Table.Tr><Table.Th>Test</Table.Th><Table.Th>Date</Table.Th><Table.Th>Result</Table.Th><Table.Th></Table.Th></Table.Tr></Table.Thead>
@@ -42,7 +42,12 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
                     <Table.Td>
                       {isBad ? <Badge color="red">{log.result}</Badge> : <Badge color="gray">{log.result}</Badge>}
                     </Table.Td>
-                    <Table.Td><ActionIcon color="red" size="sm" onClick={() => removeLabLog(originalIndex)}><Trash size={14} /></ActionIcon></Table.Td>
+                    <Table.Td>
+                      <Group gap="xs">
+                        <ActionIcon color="blue" size="sm" variant="light" onClick={() => startEditLabLog(originalIndex)} title="Edit"><Pencil size={14} /></ActionIcon>
+                        <ActionIcon color="red" size="sm" onClick={() => removeLabLog(originalIndex)} title="Delete"><Trash size={14} /></ActionIcon>
+                      </Group>
+                    </Table.Td>
                   </Table.Tr>
                 );
               })}

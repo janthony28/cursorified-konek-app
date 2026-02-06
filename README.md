@@ -1,6 +1,6 @@
 # React + Vite
 
-**Supabase:** For multi-baby reporting, ensure the `maternal_records` table has a `baby_details` column (type `jsonb`, default `'[]'`). Each item is `{ weight, category, sex }`.
+**Supabase:** For multi-baby reporting, ensure the `maternal_records` table has a `baby_details` column (type `jsonb`, default `'[]'`). Each item is `{ weight, category, sex }`. For high-risk checklists, optional boolean columns: `has_hypertension`, `has_gestational_diabetes`, `has_advanced_maternal_age`, `has_multiple_gestation`, `has_multiple_miscarriages`, `has_obesity` (the app will send these on save; add them in the table if you want them persisted).
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

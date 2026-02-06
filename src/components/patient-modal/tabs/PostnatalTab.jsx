@@ -1,5 +1,5 @@
 import { Paper, Box, Stack, Group, Grid, Input, NumberInput, Select, Button, Table, ActionIcon, Text, Progress, Divider, Badge, TextInput } from '@mantine/core';
-import { Trash } from 'lucide-react';
+import { Trash, Pencil } from 'lucide-react';
 import { formatDate } from '../../../lib/formatters';
 
 export default function PostnatalTab({
@@ -9,6 +9,8 @@ export default function PostnatalTab({
   setNewPostpartumLog,
   addPostpartumLog,
   removePostpartumLog,
+  editingPostpartumIndex,
+  startEditPostpartumLog,
   handlePncDateChange,
   postpartumProgress,
 }) {
@@ -57,7 +59,7 @@ export default function PostnatalTab({
                   <NumberInput placeholder="Tabs" value={newPostpartumLog.count} onChange={(v) => setNewPostpartumLog({ ...newPostpartumLog, count: v })} />
                 </Group>
                 <Select placeholder="Remarks (Optional)" data={[{ value: 'Trans In', label: 'A - Trans In' }, { value: 'Trans Out', label: 'B - Trans Out before 4PNC' }]} value={newPostpartumLog.remarks} onChange={(v) => setNewPostpartumLog({ ...newPostpartumLog, remarks: v })} clearable />
-                <Button onClick={addPostpartumLog} size="xs" variant="light" fullWidth>+ Add Log</Button>
+                <Button onClick={addPostpartumLog} size="xs" variant="light" fullWidth>{editingPostpartumIndex != null ? 'Update Log' : '+ Add Log'}</Button>
               </Stack>
 
               <Box mt="md" style={{ maxHeight: 120, overflowY: 'auto' }}>
@@ -68,7 +70,12 @@ export default function PostnatalTab({
                         <Table.Td>{formatDate(log.date)}</Table.Td>
                         <Table.Td>{log.count} tabs</Table.Td>
                         <Table.Td style={{ fontSize: '10px' }}>{log.remarks}</Table.Td>
-                        <Table.Td><ActionIcon size="sm" color="red" onClick={() => removePostpartumLog(i)}><Trash size={14} /></ActionIcon></Table.Td>
+                        <Table.Td>
+                          <Group gap="xs">
+                            <ActionIcon size="sm" color="blue" variant="light" onClick={() => startEditPostpartumLog(i)} title="Edit"><Pencil size={14} /></ActionIcon>
+                            <ActionIcon size="sm" color="red" onClick={() => removePostpartumLog(i)} title="Delete"><Trash size={14} /></ActionIcon>
+                          </Group>
+                        </Table.Td>
                       </Table.Tr>
                     ))}
                   </Table.Tbody>

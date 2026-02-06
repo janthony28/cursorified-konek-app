@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Paper, Box, Stack, Group, Grid, Input, Select, TextInput, Checkbox, Text, NumberInput, Button } from '@mantine/core';
 import { ArrowRight } from 'lucide-react';
+import { getWeeksAOG } from '../../../lib/patientHelpers';
 
 export default function DeliveryTab({ formData, setFormData, formErrors, handleBirthWeightChange, handleBabySexChange, isAborted, nextTab }) {
   const [selectedBabyIndex, setSelectedBabyIndex] = useState(0);
@@ -42,6 +43,27 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
     });
   };
 
+  const publicFacilityPlaces = ['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary'];
+  const isPublicFacilityPlace = publicFacilityPlaces.includes(formData.delivery_place || '');
+
+  // FHSIS: AB < 20w, PT 20–<37w, FT ≥ 37w, FD any
+  const outcomeOptions = useMemo(() => {
+    const weeks = getWeeksAOG(formData.lmp, formData.delivery_date);
+    const base = [
+      { value: 'FT', label: 'FT - Full Term' },
+      { value: 'PT', label: 'PT - Pre-term' },
+      { value: 'FD', label: 'FD - Fetal Death' },
+      { value: 'AB', label: 'AB - Abortion' },
+    ];
+    return base.map((opt) => {
+      if (opt.value === 'FD') return { ...opt, disabled: false };
+      if (opt.value === 'AB') return { ...opt, disabled: weeks !== null && weeks >= 20 };
+      if (opt.value === 'PT') return { ...opt, disabled: weeks === null || weeks < 20 || weeks >= 37 };
+      if (opt.value === 'FT') return { ...opt, disabled: weeks === null || weeks < 37 };
+      return opt;
+    });
+  }, [formData.lmp, formData.delivery_date]);
+
   return (
     <>
       <Grid grow>
@@ -55,7 +77,7 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
               <Select
                 label="Outcome"
                 placeholder="--"
-                data={[{ value: 'FT', label: 'FT - Full Term' }, { value: 'PT', label: 'PT - Pre-term' }, { value: 'FD', label: 'FD - Fetal Death' }, { value: 'AB', label: 'AB - Abortion' }]}
+                data={outcomeOptions}
                 value={formData.delivery_outcome || ''}
                 onChange={(val) => {
                   if (val === 'FD' || val === 'AB') {
@@ -224,10 +246,10 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
         </Box>
         <Grid p="sm">
           <Grid.Col span={4}>
-            <Select disabled={isAborted} label="Place" placeholder="Select Place..." data={['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary', 'Ambulance', 'Others']} value={formData.delivery_place || ''} onChange={(val) => setFormData({ ...formData, delivery_place: val, ...(val !== 'Others' ? { delivery_non_health_facility: '', delivery_non_health_place: '' } : {}) })} />
+            <Select disabled={isAborted} label="Place" placeholder="Select Place..." data={['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary', 'Ambulance', 'Others']} value={formData.delivery_place || ''} onChange={(val) => setFormData({ ...formData, delivery_place: val, ...(publicFacilityPlaces.includes(val || '') ? { delivery_facility_type: 'Public' } : {}), ...(val !== 'Others' ? { delivery_non_health_facility: '', delivery_non_health_place: '' } : {}) })} />
           </Grid.Col>
           <Grid.Col span={4}>
-            <Select disabled={isAborted} label="Facility Type" placeholder="Select Type..." data={['Public', 'Private']} value={formData.delivery_facility_type || ''} onChange={(val) => setFormData({ ...formData, delivery_facility_type: val })} />
+            <Select disabled={isAborted || isPublicFacilityPlace} label="Facility Type" placeholder="Select Type..." data={['Public', 'Private']} value={isPublicFacilityPlace ? 'Public' : (formData.delivery_facility_type || '')} onChange={(val) => setFormData({ ...formData, delivery_facility_type: val })} />
           </Grid.Col>
           <Grid.Col span={4}>
             <Stack gap="xs">

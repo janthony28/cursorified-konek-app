@@ -54,18 +54,54 @@ export function calculateEDC(lmpDate) {
   return date.toISOString().split('T')[0];
 }
 
+/** Maximum AOG in weeks (post-term cap per standard practice). */
+const MAX_AOG_WEEKS = 43;
+
 export function calculateAOGData(lmp, visitDate) {
   if (!lmp || !visitDate) return { aog: '', trimester: '' };
   const start = new Date(lmp);
   const end = new Date(visitDate);
   if (end - start < 0) return { aog: 'Invalid', trimester: '' };
   const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-  const weeks = Math.floor(diffDays / 7);
+  let weeks = Math.floor(diffDays / 7);
   const days = diffDays % 7;
+  if (weeks > MAX_AOG_WEEKS) {
+    weeks = MAX_AOG_WEEKS;
+  }
   let trim = '1st Trimester';
   if (weeks > 13) trim = '2nd Trimester';
   if (weeks > 27) trim = '3rd Trimester';
   return { aog: `${weeks} weeks ${days} days`, trimester: trim };
+}
+
+/**
+ * Gestational age in whole weeks at a given date (from LMP).
+ * Used for FHSIS outcome rules: AB < 20w, PT 20–<37w, FT ≥ 37w.
+ * @param {string} lmp - Last menstrual period (YYYY-MM-DD)
+ * @param {string} date - Date of delivery/termination (YYYY-MM-DD)
+ * @returns {number|null} Weeks, or null if invalid/missing
+ */
+export function getWeeksAOG(lmp, date) {
+  if (!lmp || !date) return null;
+  const start = new Date(lmp);
+  const end = new Date(date);
+  if (end - start < 0) return null;
+  const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+  const weeks = Math.floor(diffDays / 7);
+  return weeks > MAX_AOG_WEEKS ? MAX_AOG_WEEKS : weeks;
+}
+
+/**
+ * Raw gestational age in whole weeks (no cap). Use for validation (e.g. reject visit date when > 43 weeks).
+ * @returns {number|null} Weeks, or null if invalid/missing
+ */
+export function getRawWeeksAOG(lmp, date) {
+  if (!lmp || !date) return null;
+  const start = new Date(lmp);
+  const end = new Date(date);
+  if (end - start < 0) return null;
+  const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+  return Math.floor(diffDays / 7);
 }
 
 /** Parse "Others: xxx" into { main: 'Others', specify: 'xxx' } */

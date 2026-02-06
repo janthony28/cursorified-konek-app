@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import Login from './Login';
-import { getAgeGroup, calculateEDC, calculateAOGData, isPatientDue, parseOthers, getLatestPrenatalVisit } from './lib/patientHelpers';
+import { getAgeGroup, calculateEDC, calculateAOGData, isPatientDue, parseOthers, getLatestPrenatalVisit, getRawWeeksAOG } from './lib/patientHelpers';
 import { formatDate } from './lib/formatters';
 import { getInitialFormState } from './lib/initialFormState';
 import DashboardView from './components/dashboard/DashboardView';
@@ -240,6 +240,12 @@ function MainApp({ session, onLogout }) {
         notifications.show({ title: 'Invalid date', message: `Visit date must be after the latest visit (${formatDate(latest.date)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
         return;
       }
+      const rawWeeks = getRawWeeksAOG(formData.lmp, date);
+      if (rawWeeks !== null && rawWeeks > 43) {
+        notifications.show({ title: 'Invalid visit date', message: 'Visit date cannot be beyond 43 weeks AOG. Please choose another date.', color: 'red' });
+        setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
+        return;
+      }
     }
     const { aog, trimester } = calculateAOGData(formData.lmp, date);
     setNewVisit({ ...newVisit, date, aog, trimester });
@@ -263,6 +269,12 @@ function MainApp({ session, onLogout }) {
 
   const addVisitToList = () => {
     if (!newVisit.date) return notifications.show({ title: 'Required', message: 'Please enter visit date.', color: 'red' });
+    const rawWeeks = getRawWeeksAOG(formData.lmp, newVisit.date);
+    if (rawWeeks !== null && rawWeeks > 43) {
+      notifications.show({ title: 'Invalid visit date', message: 'Visit date cannot be beyond 43 weeks AOG. Please choose another date.', color: 'red' });
+      setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
+      return;
+    }
     if (newVisit.trimester === '1st Trimester' && (newVisit.weight === '' || newVisit.weight == null)) return notifications.show({ title: 'Required', message: 'Weight is required for 1st trimester visits.', color: 'red' });
     const otherVisits = editingVisitIndex != null ? formData.prenatal_visits.filter((_, idx) => idx !== editingVisitIndex) : formData.prenatal_visits;
     const latest = getLatestPrenatalVisit(otherVisits);
@@ -563,6 +575,10 @@ function MainApp({ session, onLogout }) {
       } else {
         rawPayload.delivery_non_health_facility = null;
         rawPayload.delivery_non_health_place = null;
+      }
+      const publicFacilityPlaces = ['BHS', 'RHU/UHU', 'Govt Hospital', 'Public Infirmary'];
+      if (publicFacilityPlaces.includes(formData.delivery_place || '')) {
+        rawPayload.delivery_facility_type = 'Public';
       }
 
       const numberFields = ['age', 'gravida', 'parity', 'birth_weight', 'height', 'weight', 'bmi', 'postpartum_ifa_count', 'pregnancy_multiple_count'];

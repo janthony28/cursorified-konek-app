@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { parseOthers } from './patientHelpers';
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -448,7 +449,10 @@ export async function exportMaternalTcl(patients, options = {}) {
     const visits = Array.isArray(p.prenatal_visits) ? [...p.prenatal_visits] : [];
     visits.sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
     const visitDates = visits.map((v) => v?.date || '');
-    const firstTrimesterVisit = visits.find((v) => v?.trimester === '1st Trimester') || {};
+    const firstTrimesterVisits = visits.filter((v) => v?.trimester === '1st Trimester');
+    const firstTrimesterVisit = firstTrimesterVisits.length
+      ? firstTrimesterVisits[firstTrimesterVisits.length - 1]
+      : {};
 
     const labLogs = p.lab_logs || [];
     const syphilis = getLabEntry(labLogs, 'Syphilis');
@@ -524,10 +528,16 @@ export async function exportMaternalTcl(patients, options = {}) {
       deliveryPlace: p.delivery_place || '',
       facilityType: p.delivery_facility_type || '',
       facilityCapable: p.delivery_place_capable || '',
-      nonHealthFacility: p.delivery_non_health_facility || '',
+      nonHealthFacility: p.delivery_non_health_facility === 'Others' ? 'Others' : (p.delivery_non_health_facility || ''),
       nonHealthPlace: p.delivery_non_health_place || '',
-      attendant: p.delivery_attendant || '',
-      attendantSpecify: p.delivery_attendant_specify || '',
+      attendant: (() => {
+        const parsed = parseOthers(p.delivery_attendant);
+        return parsed.main || '';
+      })(),
+      attendantSpecify: (() => {
+        const parsed = parseOthers(p.delivery_attendant);
+        return parsed.specify || '';
+      })(),
       deliveryTime: p.delivery_time || '',
       pnc1: p.pnc_date_1 || '',
       pnc2: p.pnc_date_2 || '',

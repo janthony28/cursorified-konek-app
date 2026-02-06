@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Stack, Title, SimpleGrid, Paper, Group, Text, Button, ThemeIcon, Select, Grid } from '@mantine/core';
 import { FileText, Download } from 'lucide-react';
-import { exportToExcel } from '../../lib/fhsisExport';
+import { exportToExcel, exportMaternalTcl } from '../../lib/fhsisExport';
 import { filterPatientsByReportMonth } from '../../lib/reportMonthFilter';
 import { BATANGAS_BARANGAYS } from '../../lib/constants';
 
@@ -31,31 +31,51 @@ const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).ma
 const BARANGAY_OPTIONS = [{ value: '', label: 'All barangays' }, ...BATANGAS_BARANGAYS];
 
 export default function ReportsView({ patients }) {
-  const [reportMonth, setReportMonth] = useState(String(currentDate.getMonth() + 1));
-  const [reportYear, setReportYear] = useState(String(currentYear));
-  const [reportBarangay, setReportBarangay] = useState('');
+  // FHSIS M1 tile: its own filters
+  const [fhsisMonth, setFhsisMonth] = useState(String(currentDate.getMonth() + 1));
+  const [fhsisYear, setFhsisYear] = useState(String(currentYear));
+  const [fhsisBarangay, setFhsisBarangay] = useState('');
 
-  const monthNum = reportMonth && reportMonth !== '' ? parseInt(reportMonth, 10) : null;
-  const yearNum = reportYear ? parseInt(reportYear, 10) : null;
-  const useMonthFilter = monthNum >= 1 && monthNum <= 12 && yearNum != null;
-  let filteredPatients = useMonthFilter
-    ? filterPatientsByReportMonth(patients || [], yearNum, monthNum)
+  // Maternal TCL tile: its own filters
+  const [tclMonth, setTclMonth] = useState(String(currentDate.getMonth() + 1));
+  const [tclYear, setTclYear] = useState(String(currentYear));
+  const [tclBarangay, setTclBarangay] = useState('');
+
+  const fhsisMonthNum = fhsisMonth && fhsisMonth !== '' ? parseInt(fhsisMonth, 10) : null;
+  const fhsisYearNum = fhsisYear ? parseInt(fhsisYear, 10) : null;
+  const fhsisUseMonth = fhsisMonthNum >= 1 && fhsisMonthNum <= 12 && fhsisYearNum != null;
+  let filteredFhsis = fhsisUseMonth
+    ? filterPatientsByReportMonth(patients || [], fhsisYearNum, fhsisMonthNum)
     : patients || [];
-  if (reportBarangay) {
-    filteredPatients = filteredPatients.filter((p) => p.barangay === reportBarangay);
-  }
+  if (fhsisBarangay) filteredFhsis = filteredFhsis.filter((p) => p.barangay === fhsisBarangay);
+
+  const tclMonthNum = tclMonth && tclMonth !== '' ? parseInt(tclMonth, 10) : null;
+  const tclYearNum = tclYear ? parseInt(tclYear, 10) : null;
+  const tclUseMonth = tclMonthNum >= 1 && tclMonthNum <= 12 && tclYearNum != null;
+  let filteredTcl = tclUseMonth
+    ? filterPatientsByReportMonth(patients || [], tclYearNum, tclMonthNum)
+    : patients || [];
+  if (tclBarangay) filteredTcl = filteredTcl.filter((p) => p.barangay === tclBarangay);
 
   const handleExport = () => {
     const options = {
-      ...(useMonthFilter ? { reportYear: yearNum, reportMonth: monthNum } : {}),
-      ...(reportBarangay ? { reportBarangay } : {}),
+      ...(fhsisUseMonth ? { reportYear: fhsisYearNum, reportMonth: fhsisMonthNum } : {}),
+      ...(fhsisBarangay ? { reportBarangay: fhsisBarangay } : {}),
     };
-    exportToExcel(filteredPatients, options);
+    exportToExcel(filteredFhsis, options);
+  };
+
+  const handleExportMaternalTcl = () => {
+    const options = {
+      ...(tclUseMonth ? { reportYear: tclYearNum, reportMonth: tclMonthNum } : {}),
+      ...(tclBarangay ? { reportBarangay: tclBarangay } : {}),
+    };
+    exportMaternalTcl(filteredTcl, options);
   };
 
   return (
     <Stack>
-      <Title order={3}>Maternal Care Reports (WORK IN PROGRESS)</Title>
+      <Title order={3}>Maternal Care Reports</Title>
       <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <Paper withBorder p="lg" radius="md" shadow="sm">
           <Group mb="md">
@@ -71,8 +91,8 @@ export default function ReportsView({ patients }) {
                 label="Month"
                 placeholder="All months"
                 data={MONTH_OPTIONS}
-                value={reportMonth}
-                onChange={(v) => setReportMonth(v ?? '')}
+                value={fhsisMonth}
+                onChange={(v) => setFhsisMonth(v ?? '')}
                 allowDeselect
                 clearable
               />
@@ -81,8 +101,8 @@ export default function ReportsView({ patients }) {
               <Select
                 label="Year"
                 data={YEAR_OPTIONS}
-                value={reportYear}
-                onChange={(v) => setReportYear(v ?? String(currentYear))}
+                value={fhsisYear}
+                onChange={(v) => setFhsisYear(v ?? String(currentYear))}
               />
             </Grid.Col>
             <Grid.Col span={12}>
@@ -90,23 +110,80 @@ export default function ReportsView({ patients }) {
                 label="Barangay"
                 placeholder="All barangays"
                 data={BARANGAY_OPTIONS}
-                value={reportBarangay}
-                onChange={(v) => setReportBarangay(v ?? '')}
+                value={fhsisBarangay}
+                onChange={(v) => setFhsisBarangay(v ?? '')}
                 searchable
                 allowDeselect
                 clearable
               />
             </Grid.Col>
           </Grid>
-          {(useMonthFilter || reportBarangay) && (
+          {(fhsisUseMonth || fhsisBarangay) && (
             <Text size="sm" c="dimmed" mb="sm">
-              {filteredPatients.length} record(s)
-              {useMonthFilter && ` with activity in ${MONTH_OPTIONS.find((m) => m.value === reportMonth)?.label} ${reportYear}`}
-              {reportBarangay && ` in ${reportBarangay}`}.
+              {filteredFhsis.length} record(s)
+              {fhsisUseMonth && ` with activity in ${MONTH_OPTIONS.find((m) => m.value === fhsisMonth)?.label} ${fhsisYear}`}
+              {fhsisBarangay && ` in ${fhsisBarangay}`}.
             </Text>
           )}
           <Button fullWidth color="pink" leftSection={<Download size={16} />} onClick={handleExport}>
-            Download Excel Report
+            Download FHSIS M1 Excel
+          </Button>
+        </Paper>
+
+        <Paper withBorder p="lg" radius="md" shadow="sm">
+          <Group mb="md">
+            <ThemeIcon size="xl" color="teal" variant="light">
+              <FileText size={24} />
+            </ThemeIcon>
+            <Text fw={700} size="lg">
+              Maternal TCL
+            </Text>
+          </Group>
+          <Text size="sm" c="dimmed" mb="md">
+            Target Client List layout for maternal care and services, exported as a spreadsheet using the official TCL format.
+          </Text>
+          <Grid mb="lg">
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Select
+                label="Month"
+                placeholder="All months"
+                data={MONTH_OPTIONS}
+                value={tclMonth}
+                onChange={(v) => setTclMonth(v ?? '')}
+                allowDeselect
+                clearable
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Select
+                label="Year"
+                data={YEAR_OPTIONS}
+                value={tclYear}
+                onChange={(v) => setTclYear(v ?? String(currentYear))}
+              />
+            </Grid.Col>
+            <Grid.Col span={12}>
+              <Select
+                label="Barangay"
+                placeholder="All barangays"
+                data={BARANGAY_OPTIONS}
+                value={tclBarangay}
+                onChange={(v) => setTclBarangay(v ?? '')}
+                searchable
+                allowDeselect
+                clearable
+              />
+            </Grid.Col>
+          </Grid>
+          {(tclUseMonth || tclBarangay) && (
+            <Text size="sm" c="dimmed" mb="sm">
+              {filteredTcl.length} record(s)
+              {tclUseMonth && ` with activity in ${MONTH_OPTIONS.find((m) => m.value === tclMonth)?.label} ${tclYear}`}
+              {tclBarangay && ` in ${tclBarangay}`}.
+            </Text>
+          )}
+          <Button fullWidth color="teal" leftSection={<Download size={16} />} onClick={handleExportMaternalTcl}>
+            Download Maternal TCL
           </Button>
         </Paper>
       </SimpleGrid>

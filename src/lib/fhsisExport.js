@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 /**
- * Export maternal patients to FHSIS format matching the official template (image layout).
+ * Export maternal patients to FHSIS M1 format (aggregated indicators).
  * @param {Array} patients - List of maternal records (typically filtered by report month)
  * @param {{ reportYear?: number, reportMonth?: number, reportBarangay?: string }} options - Optional report period and barangay for header/filename
  */
@@ -333,4 +333,238 @@ export async function exportToExcel(patients, options = {}) {
 
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(new Blob([buffer]), `FHSIS_Maternal_Report_${dateLabel}.xlsx`);
+}
+
+/**
+ * Export Maternal Target Client List (TCL) using the HTML layout in `TCL/Maternal.html`.
+ *
+ * This function:
+ * - Downloads the existing HTML template as-is so the spacing, alignment and grid lines
+ *   match the Google Sheets design exactly.
+ * - Saves it with an Excel-friendly MIME type and `.xls` extension so it opens
+ *   directly in Excel/LibreOffice as a spreadsheet.
+ * - Currently focuses on reproducing the layout; the `patients` parameter is reserved
+ *   for future enhancements where you may want to inject patient-level data into
+ *   specific cells.
+ *
+ * @param {Array} patients - List of maternal records (currently unused, kept for future binding)
+ * @param {{ reportYear?: number, reportMonth?: number }} options
+ */
+export async function exportMaternalTcl(patients, options = {}) {
+  const { reportYear, reportMonth } = options;
+  const dateLabel =
+    reportYear != null && reportMonth != null
+      ? `${reportYear}-${String(reportMonth).padStart(2, '0')}`
+      : new Date().toISOString().split('T')[0];
+
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('Maternal TCL');
+
+  // Headers include legend in the same cell (wrap); header row height increased to fit.
+  sheet.columns = [
+    { header: 'No.', key: 'no', width: 6 },
+    { header: 'Date of Registration (mm/dd/yy)', key: 'dateReg', width: 18 },
+    { header: 'Full Name (Last Name, First Name, MI)', key: 'fullName', width: 30 },
+    { header: 'Complete Address', key: 'address', width: 30 },
+    { header: 'Age (years)', key: 'age', width: 9 },
+    { header: 'Age Group\nA=10-14, B=15-19, C=20-49 y.o.', key: 'ageGroup', width: 14 },
+    { header: 'LMP (mm/dd/yy)', key: 'lmp', width: 14 },
+    { header: 'Gravida', key: 'gravida', width: 8 },
+    { header: 'Parity', key: 'parity', width: 8 },
+    { header: 'EDD (mm/dd/yy)', key: 'edd', width: 14 },
+    { header: 'ANC Visit 1 Date', key: 'anc1', width: 15 },
+    { header: 'ANC Visit 2 Date', key: 'anc2', width: 15 },
+    { header: 'ANC Visit 3 Date', key: 'anc3', width: 15 },
+    { header: 'ANC Visit 4 Date', key: 'anc4', width: 15 },
+    { header: 'ANC Visit 5 Date', key: 'anc5', width: 15 },
+    { header: 'ANC Visit 6 Date', key: 'anc6', width: 15 },
+    { header: 'ANC Visit 7 Date', key: 'anc7', width: 15 },
+    { header: 'ANC Visit 8 Date', key: 'anc8', width: 15 },
+    { header: 'BMI (1st Trimester)', key: 'bmi1', width: 14 },
+    { header: 'BMI Category (1st tri)\nLow <18.5, Normal 18.5-22.9, High ≥23', key: 'bmiCat1', width: 18 },
+    { header: 'Td1 Date', key: 'td1', width: 12 },
+    { header: 'Td2 Date', key: 'td2', width: 12 },
+    { header: 'Td3 Date', key: 'td3', width: 12 },
+    { header: 'Td4 Date', key: 'td4', width: 12 },
+    { header: 'Td5 Date', key: 'td5', width: 12 },
+    { header: 'Deworming Given?\n1=Yes, 0=No', key: 'dewormingGiven', width: 14 },
+    { header: 'Deworming Date', key: 'dewormingDate', width: 14 },
+    { header: 'Syphilis Screen Date', key: 'syphilisDate', width: 16 },
+    { header: 'Syphilis Result\n1=pos, 0=neg', key: 'syphilisResult', width: 14 },
+    { header: 'HIV Screen Date', key: 'hivDate', width: 16 },
+    { header: 'HIV Result\n1=reactive, 0=neg', key: 'hivResult', width: 16 },
+    { header: 'Hep B Screen Date', key: 'hepbDate', width: 16 },
+    { header: 'Hep B Result\n1=reactive, 0=neg', key: 'hepbResult', width: 16 },
+    { header: 'CBC Date', key: 'cbcDate', width: 16 },
+    { header: 'CBC Result\n1=with anemia, 0=w/o', key: 'cbcResult', width: 18 },
+    { header: 'GDM Screen Date', key: 'gdmDate', width: 16 },
+    { header: 'GDM Result\n1=pos, 0=neg', key: 'gdmResult', width: 14 },
+    { header: 'Date Terminated (mm/dd/yy)', key: 'deliveryDate', width: 18 },
+    { header: 'Outcome\nFT=Full term, PT=Pre-term, FD=Fetal death, AB=Abortion', key: 'deliveryOutcome', width: 22 },
+    { header: 'Delivery Type\nCS=Cesarean, VD=Vaginal, CVCD=Combined', key: 'deliveryMode', width: 20 },
+    { header: 'Birth Weight (grams, Baby 1)', key: 'birthWeight', width: 20 },
+    { header: 'Birth Weight Category\nA=Normal, B=Low, C=Unknown', key: 'birthWeightCat', width: 20 },
+    { header: 'Sex of Baby 1 (M/F)', key: 'birthSex', width: 14 },
+    { header: 'Place of Delivery (health facility)', key: 'deliveryPlace', width: 26 },
+    { header: 'Facility Type (Public/Private)', key: 'facilityType', width: 20 },
+    { header: 'BEmONC/CEmONC Capable? (Yes/No)', key: 'facilityCapable', width: 24 },
+    { header: 'Non-Health Facility (Home/Others)', key: 'nonHealthFacility', width: 26 },
+    { header: 'Non-Health Facility Place (specify)', key: 'nonHealthPlace', width: 26 },
+    { header: 'Birth Attendant (MD/RN/MW/Others)', key: 'attendant', width: 26 },
+    { header: 'Birth Attendant (specify, if Others)', key: 'attendantSpecify', width: 26 },
+    { header: 'Time of Delivery', key: 'deliveryTime', width: 16 },
+    { header: 'PNC Contact 1 Date', key: 'pnc1', width: 16 },
+    { header: 'PNC Contact 2 Date', key: 'pnc2', width: 16 },
+    { header: 'PNC Contact 3 Date', key: 'pnc3', width: 16 },
+    { header: 'PNC Contact 4 Date', key: 'pnc4', width: 16 },
+    { header: 'Completed 4PNC?\n1=Yes, 0=No', key: 'pncCompleted', width: 14 },
+    { header: 'Postpartum IFA Total Tabs', key: 'ppIfaCount', width: 20 },
+    { header: 'Postpartum IFA Completed Date', key: 'ppIfaDate', width: 22 },
+    { header: 'Vitamin A Completed Date', key: 'vitADate', width: 20 },
+  ];
+
+  const getAgeGroup = (age) => {
+    if (age >= 10 && age <= 14) return 'A';
+    if (age >= 15 && age <= 19) return 'B';
+    if (age >= 20 && age <= 49) return 'C';
+    return '';
+  };
+
+  const getLabEntry = (logs, type) => {
+    if (!Array.isArray(logs)) return null;
+    return logs.find((l) => l && l.type === type) || null;
+  };
+
+  (patients || []).forEach((p, idx) => {
+    const ageNum = Number(p.age || 0);
+
+    const fullName = [p.last_name, p.first_name, p.middle_name || p.middle_initial]
+      .filter(Boolean)
+      .join(', ');
+    const addressParts = [p.address, p.sitio, p.barangay, p.city_municipality, p.province]
+      .filter(Boolean);
+    const address = addressParts.join(', ');
+
+    const visits = Array.isArray(p.prenatal_visits) ? [...p.prenatal_visits] : [];
+    visits.sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
+    const visitDates = visits.map((v) => v?.date || '');
+    const firstTrimesterVisit = visits.find((v) => v?.trimester === '1st Trimester') || {};
+
+    const labLogs = p.lab_logs || [];
+    const syphilis = getLabEntry(labLogs, 'Syphilis');
+    const hiv = getLabEntry(labLogs, 'HIV');
+    const hepb = getLabEntry(labLogs, 'Hep B');
+    const cbc = getLabEntry(labLogs, 'CBC');
+    const gdm = getLabEntry(labLogs, 'Gestational Diabetes');
+
+    const isSyphilisPos = syphilis?.result === 'Positive' || p.lab_syphilis_result === 'Reactive';
+    const isHivPos = hiv?.result === 'Positive' || p.lab_hiv_result === 'Reactive';
+    const isHepbPos = hepb?.result === 'Positive' || p.lab_hepb_result === 'Reactive';
+    const isCbcAnemia = cbc?.result === 'With Anemia' || p.lab_cbc_result === 'With Anemia';
+    const isGdmPos = gdm?.result === 'Positive' || p.lab_diabetes_result === 'Positive';
+
+    const is4PncCompleted =
+      p.is_4pnc_completed === 'Yes' ||
+      p.is_4pnc_completed === true ||
+      p.is_4pnc_completed === 'true';
+
+    const babyDetails = Array.isArray(p.baby_details) && p.baby_details.length > 0
+      ? p.baby_details
+      : [];
+    const firstBaby = babyDetails[0] || {};
+
+    sheet.addRow({
+      no: idx + 1,
+      dateReg: p.date_of_registration || p.date_registered || '',
+      fullName,
+      address,
+      age: Number.isNaN(ageNum) ? '' : ageNum,
+      ageGroup: getAgeGroup(ageNum),
+      lmp: p.lmp || '',
+      gravida: p.gravida || '',
+      parity: (p.parity === 0 || p.parity === '0') ? 0 : (p.parity ?? ''),
+      edd: p.edc || p.edd || '',
+      anc1: visitDates[0] || '',
+      anc2: visitDates[1] || '',
+      anc3: visitDates[2] || '',
+      anc4: visitDates[3] || '',
+      anc5: visitDates[4] || '',
+      anc6: visitDates[5] || '',
+      anc7: visitDates[6] || '',
+      anc8: visitDates[7] || '',
+      bmi1: firstTrimesterVisit.bmi || '',
+      bmiCat1: firstTrimesterVisit.bmi_category || '',
+      td1: p.td1 || '',
+      td2: p.td2 || '',
+      td3: p.td3 || '',
+      td4: p.td4 || '',
+      td5: p.td5 || '',
+      dewormingGiven: p.is_deworming_given ? 1 : 0,
+      dewormingDate: p.deworming_date || '',
+      syphilisDate: syphilis?.date || '',
+      syphilisResult: isSyphilisPos ? 1 : (syphilis ? 0 : ''),
+      hivDate: hiv?.date || '',
+      hivResult: isHivPos ? 1 : (hiv ? 0 : ''),
+      hepbDate: hepb?.date || '',
+      hepbResult: isHepbPos ? 1 : (hepb ? 0 : ''),
+      cbcDate: cbc?.date || '',
+      cbcResult: isCbcAnemia ? 1 : (cbc ? 0 : ''),
+      gdmDate: gdm?.date || '',
+      gdmResult: isGdmPos ? 1 : (gdm ? 0 : ''),
+      deliveryDate: p.delivery_date || '',
+      deliveryOutcome: p.delivery_outcome || '',
+      deliveryMode: p.delivery_mode || '',
+      birthWeight: firstBaby.weight || p.birth_weight || '',
+      birthWeightCat: firstBaby.category || p.birth_weight_category || '',
+      birthSex: (firstBaby.sex || p.birth_sex || '').startsWith('M')
+        ? 'M'
+        : (firstBaby.sex || p.birth_sex || '').startsWith('F')
+          ? 'F'
+          : '',
+      deliveryPlace: p.delivery_place || '',
+      facilityType: p.delivery_facility_type || '',
+      facilityCapable: p.delivery_place_capable || '',
+      nonHealthFacility: p.delivery_non_health_facility || '',
+      nonHealthPlace: p.delivery_non_health_place || '',
+      attendant: p.delivery_attendant || '',
+      attendantSpecify: p.delivery_attendant_specify || '',
+      deliveryTime: p.delivery_time || '',
+      pnc1: p.pnc_date_1 || '',
+      pnc2: p.pnc_date_2 || '',
+      pnc3: p.pnc_date_3 || '',
+      pnc4: p.pnc_date_4 || '',
+      pncCompleted: is4PncCompleted ? 1 : 0,
+      ppIfaCount: p.postpartum_ifa_count || 0,
+      ppIfaDate: p.postpartum_ifa_completed_date || '',
+      vitADate: p.vit_a_completed_date || '',
+    });
+  });
+
+  const border = {
+    top: { style: 'thin' },
+    left: { style: 'thin' },
+    bottom: { style: 'thin' },
+    right: { style: 'thin' },
+  };
+
+  sheet.eachRow((row, rowNumber) => {
+    row.eachCell((cell) => {
+      cell.border = border;
+      cell.alignment = {
+        vertical: 'middle',
+        wrapText: true,
+        horizontal: 'center',
+      };
+      if (rowNumber === 1) {
+        cell.font = { bold: true, size: 10 };
+      } else {
+        cell.font = { size: 10 };
+      }
+    });
+    // Header row taller so legend lines in headers wrap and fit.
+    row.height = rowNumber === 1 ? 48 : 18;
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  saveAs(new Blob([buffer]), `Maternal_TCL_${dateLabel}.xlsx`);
 }

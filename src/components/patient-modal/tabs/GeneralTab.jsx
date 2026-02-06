@@ -30,7 +30,7 @@ export default function GeneralTab({ formData, setFormData, formErrors, getAgeGr
           <Grid.Col span={6}> <Input.Wrapper label="LMP (Last Menstrual Period)" withAsterisk error={formErrors.lmp}> <Input error={formErrors.lmp} type="date" value={formData.lmp || ''} onChange={handleLmpChange} /> </Input.Wrapper> </Grid.Col>
           <Grid.Col span={6}> <Input.Wrapper label="EDC (Estimated Date of Confinement)"> <Input type="date" disabled style={{ backgroundColor: '#e9ecef', fontWeight: 'bold', color: '#0ca678' }} value={formData.edc || ''} /> </Input.Wrapper> </Grid.Col>
           <Grid.Col span={6}> <NumberInput error={formErrors.gravida} label="Gravida (No. of Pregnancies)" withAsterisk min={1} value={formData.gravida === null ? '' : formData.gravida} onChange={(val) => setFormData({ ...formData, gravida: val })} /> </Grid.Col>
-          <Grid.Col span={6}> <NumberInput error={formErrors.parity} label="Parity (No. of Births)" withAsterisk min={0} value={formData.parity === null ? '' : formData.parity} onChange={(val) => setFormData({ ...formData, parity: val })} /> </Grid.Col>
+          <Grid.Col span={6}> <NumberInput error={formErrors.parity} label="Parity (No. of Births)" withAsterisk min={0} value={formData.parity === 0 ? 0 : (formData.parity ?? '')} onChange={(val) => setFormData({ ...formData, parity: val })} /> </Grid.Col>
         </Grid>
       </Paper>
 

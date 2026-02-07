@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { supabase } from './supabaseClient';
-import { Container, Paper, Text, TextInput, PasswordInput, Button, Group, Anchor, Stack, Box } from '@mantine/core';
+import { Container, Paper, Text, TextInput, PasswordInput, Button, Group, Stack, Box, Anchor } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import LegalPage from './components/legal/LegalPage';
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showLegalPage, setShowLegalPage] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,6 +25,10 @@ export default function Login() {
     }
     setLoading(false);
   };
+
+  if (showLegalPage) {
+    return <LegalPage onBack={() => setShowLegalPage(false)} />;
+  }
 
   return (
     <Box
@@ -122,20 +128,6 @@ export default function Login() {
                 }}
               />
 
-              <Group justify="flex-end" mt="sm">
-                <Anchor 
-                  component="button" 
-                  size="sm" 
-                  type="button"
-                  style={{
-                    fontWeight: 500,
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  Forgot password?
-                </Anchor>
-              </Group>
-
               <Button 
                 fullWidth 
                 mt="xl" 
@@ -153,7 +145,14 @@ export default function Login() {
               </Button>
               
               <Text c="dimmed" size="xs" ta="center" mt="md" style={{ lineHeight: 1.6 }}>
-                By clicking Login, you agree to our Terms of Use and Privacy Policy.
+                By clicking Login, you agree to our{' '}
+                <Anchor component="button" type="button" size="xs" c="teal.7" fw={600} onClick={() => setShowLegalPage(true)}>
+                  Terms of Use
+                </Anchor>
+                {' '}and{' '}
+                <Anchor component="button" type="button" size="xs" c="teal.7" fw={600} onClick={() => setShowLegalPage(true)}>
+                  Privacy Policy
+                </Anchor>.
               </Text>
             </Stack>
           </form>

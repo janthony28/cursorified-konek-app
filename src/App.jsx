@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import Login from './Login';
+import SetPassword from './components/auth/SetPassword';
 import { getAgeGroup, calculateEDC, calculateAOGData, isPatientDue, parseOthers, getLatestPrenatalVisit, getRawWeeksAOG } from './lib/patientHelpers';
 import { formatDate } from './lib/formatters';
 import { getInitialFormState } from './lib/initialFormState';
@@ -14,9 +15,17 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { Box, Loader, Text } from '@mantine/core';
 
+function getHashType() {
+  const hash = window.location.hash.slice(1);
+  if (!hash) return null;
+  const params = new URLSearchParams(hash);
+  return params.get('type');
+}
+
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSetPassword, setShowSetPassword] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => { setSession(session); setLoading(false); });
@@ -24,7 +33,18 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!session) return;
+    const type = getHashType();
+    if (type === 'invite' || type === 'recovery') setShowSetPassword(true);
+  }, [session]);
+
   const clearSession = () => setSession(null);
+
+  const handleSetPasswordSuccess = () => {
+    window.history.replaceState(null, '', window.location.pathname || '/');
+    setShowSetPassword(false);
+  };
 
   if (loading) {
     return (
@@ -111,6 +131,8 @@ function App() {
     );
   }
   if (!session) return <Login />;
+
+  if (showSetPassword) return <SetPassword onSuccess={handleSetPasswordSuccess} />;
 
   return <MainApp session={session} onLogout={clearSession} />;
 }

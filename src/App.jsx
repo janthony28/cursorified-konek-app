@@ -144,6 +144,8 @@ function MainApp({ session, onLogout }) {
   const [editingSupp, setEditingSupp] = useState(null); // { type: 'IFA'|'MMS', index }
   const [editingLabIndex, setEditingLabIndex] = useState(null);
   const [editingPostpartumIndex, setEditingPostpartumIndex] = useState(null);
+  const [newPncContact, setNewPncContact] = useState({ date: '' });
+  const [editingPncContactIndex, setEditingPncContactIndex] = useState(null);
 
   useEffect(() => { const t = setInterval(() => setCurrentTime(new Date()), 1000); return () => clearInterval(t); }, []);
   useEffect(() => { fetchPatients(); }, []);
@@ -479,28 +481,34 @@ function MainApp({ session, onLogout }) {
     setEditingPostpartumIndex(index);
   };
 
-  const handlePncDateChange = (field, value) => {
-    if (!value) { setFormData({ ...formData, [field]: value }); return; }
-    const sequence = ['pnc_date_1', 'pnc_date_2', 'pnc_date_3', 'pnc_date_4'];
-    const currentIndex = sequence.indexOf(field);
-    const contactLabel = (f) => `Contact ${f.replace('pnc_date_', '')}`;
-    for (let i = 0; i < currentIndex; i++) {
-      const prevField = sequence[i];
-      const prevDateString = formData[prevField];
-      if (prevDateString && prevDateString >= value) {
-        notifications.show({ title: 'Invalid date', message: `${contactLabel(field)} cannot be earlier than or same as ${contactLabel(prevField)} (${formatDate(prevDateString)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-        return;
-      }
+  const addPncContact = () => {
+    if (!newPncContact.date) return notifications.show({ title: 'Required', message: 'Please enter contact date.', color: 'red' });
+    const list = formData.pnc_contacts || [];
+    const otherList = editingPncContactIndex != null ? list.filter((_, i) => i !== editingPncContactIndex) : list;
+    const latestDate = otherList.length ? otherList.reduce((max, c) => (c.date > max ? c.date : max), otherList[0].date) : null;
+    if (latestDate && newPncContact.date <= latestDate) {
+      notifications.show({ title: 'Invalid date', message: `Contact date must be after the latest contact (${formatDate(latestDate)}).`, color: 'red' });
+      return;
     }
-    for (let i = currentIndex + 1; i < sequence.length; i++) {
-      const nextField = sequence[i];
-      const nextDateString = formData[nextField];
-      if (nextDateString && nextDateString <= value) {
-        notifications.show({ title: 'Invalid date', message: `${contactLabel(field)} cannot be later than or same as ${contactLabel(nextField)} (${formatDate(nextDateString)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-        return;
-      }
+    const contact = { date: newPncContact.date };
+    if (editingPncContactIndex != null) {
+      const next = [...(formData.pnc_contacts || [])];
+      next[editingPncContactIndex] = contact;
+      setFormData({ ...formData, pnc_contacts: next });
+      setEditingPncContactIndex(null);
+    } else {
+      setFormData({ ...formData, pnc_contacts: [...(formData.pnc_contacts || []), contact] });
     }
-    setFormData({ ...formData, [field]: value });
+    setNewPncContact({ date: '' });
+  };
+  const removePncContact = (i) => {
+    setFormData({ ...formData, pnc_contacts: (formData.pnc_contacts || []).filter((_, idx) => idx !== i) });
+    if (editingPncContactIndex === i) { setEditingPncContactIndex(null); setNewPncContact({ date: '' }); }
+  };
+  const startEditPncContact = (i) => {
+    const c = (formData.pnc_contacts || [])[i] || {};
+    setNewPncContact({ date: c.date || '' });
+    setEditingPncContactIndex(i);
   };
 
   const handleAddClick = () => {
@@ -516,6 +524,7 @@ function MainApp({ session, onLogout }) {
     setEditingSupp(null);
     setEditingLabIndex(null);
     setEditingPostpartumIndex(null);
+    setEditingPncContactIndex(null);
     open();
   };
 
@@ -527,6 +536,10 @@ function MainApp({ session, onLogout }) {
       else cleanData[key] = patient[key];
     });
     cleanData.baby_details = Array.isArray(patient.baby_details) ? patient.baby_details : (cleanData.baby_details || []);
+    cleanData.pnc_contacts = [patient.pnc_date_1, patient.pnc_date_2, patient.pnc_date_3, patient.pnc_date_4]
+      .filter(Boolean)
+      .map((date) => ({ date }));
+    cleanData.is_8anc_completed = (patient.is_8anc_completed === true || patient.is_8anc_completed === 'Yes') ? 'Yes' : 'No';
 
     setFormData({
       ...initialFormState,
@@ -549,6 +562,7 @@ function MainApp({ session, onLogout }) {
     setEditingSupp(null);
     setEditingLabIndex(null);
     setEditingPostpartumIndex(null);
+    setEditingPncContactIndex(null);
     open();
   };
 
@@ -591,7 +605,13 @@ function MainApp({ session, onLogout }) {
       const calculatedIfaCount = (formData.postpartum_logs || []).reduce((sum, item) => sum + (Number(item.count) || 0), 0);
       const finalAttendant = formData.delivery_attendant === 'Others' ? `Others: ${formData.delivery_attendant_specify}` : formData.delivery_attendant;
 
-      const pncAllFour = [formData.pnc_date_1, formData.pnc_date_2, formData.pnc_date_3, formData.pnc_date_4].filter(Boolean).length === 4;
+      const pncContactsSorted = [...(formData.pnc_contacts || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
+      const pncFirstFour = pncContactsSorted.slice(0, 4);
+      const pncAllFour = pncFirstFour.length === 4;
+      const pncDate1 = pncFirstFour[0]?.date || '';
+      const pncDate2 = pncFirstFour[1]?.date || '';
+      const pncDate3 = pncFirstFour[2]?.date || '';
+      const pncDate4 = pncFirstFour[3]?.date || '';
       const vitADateSet = !!(formData.vit_a_completed_date && String(formData.vit_a_completed_date).trim());
       const getIfaCompletionDate = (logList) => {
         const sorted = [...(logList || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
@@ -613,7 +633,12 @@ function MainApp({ session, onLogout }) {
         bmi_category: latest.bmi_category || null,
         delivery_attendant: finalAttendant,
         postpartum_ifa_count: calculatedIfaCount,
+        pnc_date_1: pncDate1 || null,
+        pnc_date_2: pncDate2 || null,
+        pnc_date_3: pncDate3 || null,
+        pnc_date_4: pncDate4 || null,
         is_4pnc_completed: pncAllFour ? 'Yes' : 'No',
+        is_8anc_completed: (formData.prenatal_visits || []).length >= 8,
         is_postpartum_ifa_completed: calculatedIfaCount >= 90 ? 'Yes' : 'No',
         postpartum_ifa_completed_date: ifaCompletionDate,
         is_vit_a_completed: vitADateSet ? 'Yes' : 'No',
@@ -624,6 +649,7 @@ function MainApp({ session, onLogout }) {
       delete rawPayload.delivery_attendant_specify;
       delete rawPayload.td_completed_previously;
       delete rawPayload.delivery_place_specify;
+      delete rawPayload.pnc_contacts;
       if (isEditing) delete rawPayload.created_by;
 
       // Persist baby_details for reporting; empty for non–live births
@@ -670,6 +696,7 @@ function MainApp({ session, onLogout }) {
         setEditingSupp(null);
         setEditingLabIndex(null);
         setEditingPostpartumIndex(null);
+        setEditingPncContactIndex(null);
         fetchPatients();
       } else {
         notifications.show({ title: 'Error', message: error.message, color: 'red' });
@@ -754,7 +781,12 @@ function MainApp({ session, onLogout }) {
         removePostpartumLog={removePostpartumLog}
         editingPostpartumIndex={editingPostpartumIndex}
         startEditPostpartumLog={startEditPostpartumLog}
-        handlePncDateChange={handlePncDateChange}
+        newPncContact={newPncContact}
+        setNewPncContact={setNewPncContact}
+        addPncContact={addPncContact}
+        removePncContact={removePncContact}
+        editingPncContactIndex={editingPncContactIndex}
+        startEditPncContact={startEditPncContact}
         handleBirthWeightChange={handleBirthWeightChange}
         handleBabySexChange={handleBabySexChange}
         totalIFA={totalIFA}

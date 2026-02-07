@@ -11,11 +11,17 @@ export default function PostnatalTab({
   removePostpartumLog,
   editingPostpartumIndex,
   startEditPostpartumLog,
-  handlePncDateChange,
+  newPncContact,
+  setNewPncContact,
+  addPncContact,
+  removePncContact,
+  editingPncContactIndex,
+  startEditPncContact,
   postpartumProgress,
 }) {
-  const pncDatesFilled = [formData.pnc_date_1, formData.pnc_date_2, formData.pnc_date_3, formData.pnc_date_4].filter(Boolean).length;
-  const is4PncCompleted = pncDatesFilled === 4;
+  const pncContacts = formData.pnc_contacts || [];
+  const pncCount = pncContacts.length;
+  const is4PncCompleted = pncCount >= 4;
   const isPostpartumIfaCompleted = postpartumProgress >= 100;
   const isVitACompleted = !!(formData.vit_a_completed_date && String(formData.vit_a_completed_date).trim());
 
@@ -27,10 +33,33 @@ export default function PostnatalTab({
             <Text size="sm" fw={700} c="blue.9" align="center">Date of Postnatal Care (4PNC)</Text>
           </Box>
           <Stack p="sm" gap="sm">
-            <Input.Wrapper label="Contact 1 (within 24 hrs)"><Input type="date" value={formData.pnc_date_1 || ''} onChange={(e) => handlePncDateChange('pnc_date_1', e.target.value)} /></Input.Wrapper>
-            <Input.Wrapper label="Contact 2 (on day 3)"><Input type="date" value={formData.pnc_date_2 || ''} onChange={(e) => handlePncDateChange('pnc_date_2', e.target.value)} /></Input.Wrapper>
-            <Input.Wrapper label="Contact 3 (between 7-14 days)"><Input type="date" value={formData.pnc_date_3 || ''} onChange={(e) => handlePncDateChange('pnc_date_3', e.target.value)} /></Input.Wrapper>
-            <Input.Wrapper label="Contact 4 (6 weeks after birth)"><Input type="date" value={formData.pnc_date_4 || ''} onChange={(e) => handlePncDateChange('pnc_date_4', e.target.value)} /></Input.Wrapper>
+            <Group grow>
+              <Input.Wrapper label="Contact Date">
+                <Input type="date" value={newPncContact.date || ''} onChange={(e) => setNewPncContact({ ...newPncContact, date: e.target.value })} />
+              </Input.Wrapper>
+            </Group>
+            <Button fullWidth variant="outline" color="teal" onClick={addPncContact}>{editingPncContactIndex != null ? 'Update Contact' : '+ Add Contact'}</Button>
+            <Text size="xs" c="dimmed">Only the first 4 contacts (by date) are recorded in the report.</Text>
+            <Paper withBorder radius="sm" p="xs">
+              <Text size="xs" fw={700} c="dimmed" mb={4}>Contact History ({pncCount})</Text>
+              <Box style={{ maxHeight: 160, overflowY: 'auto' }}>
+                <Table striped withTableBorder>
+                  <Table.Tbody>
+                    {pncContacts.map((c, i) => (
+                      <Table.Tr key={i}>
+                        <Table.Td>{formatDate(c.date)}</Table.Td>
+                        <Table.Td>
+                          <Group gap="xs">
+                            <ActionIcon size="sm" color="blue" variant="light" onClick={() => startEditPncContact(i)} title="Edit"><Pencil size={14} /></ActionIcon>
+                            <ActionIcon size="sm" color="red" onClick={() => removePncContact(i)} title="Delete"><Trash size={14} /></ActionIcon>
+                          </Group>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </Box>
+            </Paper>
             <Box>
               <Text size="xs" fw={600} c="dimmed" mb={4}>Completed 4PNC?</Text>
               <Text size="sm" fw={500} c={is4PncCompleted ? 'green' : 'dimmed'}>{is4PncCompleted ? 'Yes' : 'No'}</Text>

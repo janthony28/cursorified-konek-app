@@ -52,6 +52,10 @@ export default function PrenatalTab({ formData, setFormData, newVisit, setNewVis
               </Table.Tbody>
             </Table>
           </Box>
+          <Box mt="sm" p="xs" style={{ borderTop: '1px solid #dee2e6' }}>
+            <Text size="xs" fw={600} c="dimmed" mb={4}>Completed?</Text>
+            <Text size="sm" fw={500} c={formData.prenatal_visits.length >= 8 ? 'green' : 'dimmed'}>{formData.prenatal_visits.length >= 8 ? 'Yes' : 'No'}</Text>
+          </Box>
         </Box>
       </Paper>
       <Group justify="flex-end" mt="md"><Button rightSection={<ArrowRight size={16} />} onClick={() => nextTab('immunization')}>Next Section</Button></Group>

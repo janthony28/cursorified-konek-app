@@ -277,6 +277,13 @@ export async function exportToExcel(patients, options = {}) {
     row.getCell(1).value = label; row.getCell(1).style = styles.normalCell;
     [2, 3, 4, 5].forEach((c, i) => { row.getCell(c).value = [c2, c3, c4, c5][i] ?? ''; row.getCell(c).style = styles.centeredCell; });
     row.getCell(6).value = ''; row.getCell(6).style = styles.normalCell;
+    row.getCell(7).value = '';
+    row.getCell(8).value = ''; row.getCell(8).style = styles.normalCell;
+    [9, 10, 11, 12].forEach((c) => { row.getCell(c).value = ''; row.getCell(c).style = styles.centeredCell; });
+    row.getCell(13).value = ''; row.getCell(13).style = styles.normalCell;
+    row.getCell(14).value = ''; row.getCell(14).style = styles.normalCell;
+    [15, 16, 17, 18].forEach((c) => { row.getCell(c).value = ''; row.getCell(c).style = styles.centeredCell; });
+    row.getCell(19).value = ''; row.getCell(19).style = styles.normalCell;
     r++;
   };
 
@@ -293,33 +300,85 @@ export async function exportToExcel(patients, options = {}) {
 
   section('Intrapartum Care and Delivery Outcome');
 
-  row3('18. Number of deliveries', 'deliveries', '21. Number of health facility-based deliveries', null, '21. Number of health facility-based deliveries', null);
-  row3('19. Number of live births', 'liveBirths', '   a. Number of deliveries in public health facility', 'facility_public', '   a. Number of deliveries in public health facility', 'facility_public');
-  row1('   a. Number of live births with normal birth weight', num('lb_normal', '10-14'), num('lb_normal', '15-19'), num('lb_normal', '20-49'), num('lb_normal', 'total'));
-  row3('', null, '   b. Number of deliveries in private health facility', 'facility_private', '   b. Number of deliveries in private health facility', 'facility_private');
-  const row19b = sheet.getRow(r);
-  row19b.getCell(1).value = '   b. Number of live births with low birth weight'; row19b.getCell(1).style = styles.normalCell;
-  sheet.mergeCells(r, 2, r, 3); row19b.getCell(2).value = 'Male'; row19b.getCell(2).style = styles.centeredCell;
-  sheet.mergeCells(r, 4, r, 5); row19b.getCell(4).value = 'Female'; row19b.getCell(4).style = styles.centeredCell;
-  row19b.getCell(6).value = ''; row19b.getCell(6).style = styles.normalCell;
-  r++;
-  row1('', data.lb_low_m?.total ?? 0, 0, data.lb_low_f?.total ?? 0, (data.lb_low_m?.total ?? 0) + (data.lb_low_f?.total ?? 0));
-  const row19c = sheet.getRow(r);
-  row19c.getCell(1).value = '   c. Number of live births with unknown birth weight'; row19c.getCell(1).style = styles.normalCell;
-  sheet.mergeCells(r, 2, r, 3); row19c.getCell(2).value = 'Male'; row19c.getCell(2).style = styles.centeredCell;
-  sheet.mergeCells(r, 4, r, 5); row19c.getCell(4).value = 'Female'; row19c.getCell(4).style = styles.centeredCell;
-  row19c.getCell(6).value = ''; row19c.getCell(6).style = styles.normalCell;
-  r++;
-  row1('', data.lb_unknown_m?.total ?? 0, 0, data.lb_unknown_f?.total ?? 0, (data.lb_unknown_m?.total ?? 0) + (data.lb_unknown_f?.total ?? 0));
-  row3('', null, '22. Number of non-facility-based deliveries', 'non_facility', '22. Number of non-facility-based deliveries', 'non_facility');
-  row3('20. Number of deliveries attended by skilled health professionals', null, '23. Type of Delivery', null, '23. Type of Delivery', null);
-  row3('   a. Number of deliveries attended by a doctor', 'attendant_md', '   a. Number of vaginal deliveries', 'del_vaginal', '   a. Number of vaginal deliveries', 'del_vaginal');
-  row3('   b. Number of deliveries attended by a nurse', 'attendant_rn', '   b. Number of deliveries by cesarean section', 'del_cs', '   b. Number of deliveries by cesarean section', 'del_cs');
-  row3('   c. Number of deliveries attended by midwives', 'attendant_mw', '24. Pregnancy Outcome', null, '24. Pregnancy Outcome', null);
-  row3('', null, '   a. Number of full-term births', 'outcome_ft', '   a. Number of full-term births', 'outcome_ft');
-  row3('', null, '   b. Number of pre-term births', 'outcome_pt', '   b. Number of pre-term births', 'outcome_pt');
-  row3('', null, '   c. Number of fetal deaths', 'outcome_fd', '   c. Number of fetal deaths', 'outcome_fd');
-  row3('', null, '   c. Number of abortion/miscarriage', 'outcome_ab', '   c. Number of abortion/miscarriage', 'outcome_ab');
+  // Helper to fill empty right-side columns (14-19) with consistent styling
+  const fillRight = (rw) => {
+    rw.getCell(14).value = ''; rw.getCell(14).style = styles.normalCell;
+    [15, 16, 17, 18].forEach((c) => { rw.getCell(c).value = ''; rw.getCell(c).style = styles.centeredCell; });
+    rw.getCell(19).value = ''; rw.getCell(19).style = styles.normalCell;
+  };
+  // Helper to set middle column label + data on a row
+  const setMiddle = (rw, rowNum, label, key) => {
+    rw.getCell(7).value = '';
+    rw.getCell(8).value = label || ''; rw.getCell(8).style = styles.normalCell;
+    if (key) { setData(rowNum, 9, key); } else { [9, 10, 11, 12].forEach((c) => { rw.getCell(c).value = ''; rw.getCell(c).style = styles.centeredCell; }); }
+    rw.getCell(13).value = ''; rw.getCell(13).style = styles.normalCell;
+  };
+
+  row3('18. Number of deliveries', 'deliveries', '21. Number of health facility-based deliveries', null, '', null);
+  row3('19. Number of live births', 'liveBirths', '   a. Number of deliveries in public health facility', 'facility_public', '', null);
+  // 19a. Normal birth weight + 21b. Private facility
+  {
+    const rw = sheet.getRow(r);
+    rw.getCell(1).value = '   a. Number of live births with normal birth weight'; rw.getCell(1).style = styles.normalCell;
+    setData(r, 2, 'lb_normal');
+    rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
+    setMiddle(rw, r, '   b. Number of deliveries in private health facility', 'facility_private');
+    fillRight(rw);
+    r++;
+  }
+  // 19b. Low birth weight header (Male / Female) + 22. Non-facility
+  {
+    const rw = sheet.getRow(r);
+    rw.getCell(1).value = '   b. Number of live births with low birth weight'; rw.getCell(1).style = styles.normalCell;
+    sheet.mergeCells(r, 2, r, 3); rw.getCell(2).value = 'Male'; rw.getCell(2).style = styles.centeredCell;
+    sheet.mergeCells(r, 4, r, 5); rw.getCell(4).value = 'Female'; rw.getCell(4).style = styles.centeredCell;
+    rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
+    setMiddle(rw, r, '22. Number of non-facility-based deliveries', 'non_facility');
+    fillRight(rw);
+    r++;
+  }
+  // 19b. Low birth weight data + 23. Type of Delivery header
+  {
+    const rw = sheet.getRow(r);
+    rw.getCell(1).value = ''; rw.getCell(1).style = styles.normalCell;
+    rw.getCell(2).value = data.lb_low_m?.total ?? 0; rw.getCell(2).style = styles.centeredCell;
+    rw.getCell(3).value = data.lb_low_f?.total ?? 0; rw.getCell(3).style = styles.centeredCell;
+    rw.getCell(4).value = (data.lb_low_m?.total ?? 0) + (data.lb_low_f?.total ?? 0); rw.getCell(4).style = styles.centeredCell;
+    rw.getCell(5).value = ''; rw.getCell(5).style = styles.centeredCell;
+    rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
+    setMiddle(rw, r, '23. Type of Delivery', null);
+    fillRight(rw);
+    r++;
+  }
+  // 19c. Unknown birth weight header (Male / Female) + 23a. Vaginal
+  {
+    const rw = sheet.getRow(r);
+    rw.getCell(1).value = '   c. Number of live births with unknown birth weight'; rw.getCell(1).style = styles.normalCell;
+    sheet.mergeCells(r, 2, r, 3); rw.getCell(2).value = 'Male'; rw.getCell(2).style = styles.centeredCell;
+    sheet.mergeCells(r, 4, r, 5); rw.getCell(4).value = 'Female'; rw.getCell(4).style = styles.centeredCell;
+    rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
+    setMiddle(rw, r, '   a. Number of vaginal deliveries', 'del_vaginal');
+    fillRight(rw);
+    r++;
+  }
+  // 19c. Unknown birth weight data + 23b. Cesarean
+  {
+    const rw = sheet.getRow(r);
+    rw.getCell(1).value = ''; rw.getCell(1).style = styles.normalCell;
+    rw.getCell(2).value = data.lb_unknown_m?.total ?? 0; rw.getCell(2).style = styles.centeredCell;
+    rw.getCell(3).value = data.lb_unknown_f?.total ?? 0; rw.getCell(3).style = styles.centeredCell;
+    rw.getCell(4).value = (data.lb_unknown_m?.total ?? 0) + (data.lb_unknown_f?.total ?? 0); rw.getCell(4).style = styles.centeredCell;
+    rw.getCell(5).value = ''; rw.getCell(5).style = styles.centeredCell;
+    rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
+    setMiddle(rw, r, '   b. Number of deliveries by cesarean section', 'del_cs');
+    fillRight(rw);
+    r++;
+  }
+  row3('20. Number of deliveries attended by skilled health professionals', null, '24. Pregnancy Outcome', null, '', null);
+  row3('   a. Number of deliveries attended by a doctor', 'attendant_md', '   a. Number of full-term births', 'outcome_ft', '', null);
+  row3('   b. Number of deliveries attended by a nurse', 'attendant_rn', '   b. Number of pre-term births', 'outcome_pt', '', null);
+  row3('   c. Number of deliveries attended by midwives', 'attendant_mw', '   c. Number of fetal deaths', 'outcome_fd', '', null);
+  row3('', null, '   d. Number of abortion/miscarriage', 'outcome_ab', '', null);
 
   section('Postpartum and Newborn Care');
 

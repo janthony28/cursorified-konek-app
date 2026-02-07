@@ -18,7 +18,7 @@ export function getInitialFormState() {
     aog: '',
     trimester: '',
     prenatal_remarks: '',
-    is_8anc_completed: false,
+    is_8anc_completed: '',
 
     height: '',
     weight: '',
@@ -73,6 +73,7 @@ export function getInitialFormState() {
     delivery_place_capable: '',
 
     pnc_date_1: '', pnc_date_2: '', pnc_date_3: '', pnc_date_4: '',
+    pnc_contacts: [],
     is_4pnc_completed: '',
     pnc_remarks: '',
 

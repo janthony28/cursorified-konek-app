@@ -50,7 +50,12 @@ export default function PatientModal({
   removePostpartumLog,
   editingPostpartumIndex,
   startEditPostpartumLog,
-  handlePncDateChange,
+  newPncContact,
+  setNewPncContact,
+  addPncContact,
+  removePncContact,
+  editingPncContactIndex,
+  startEditPncContact,
   handleBirthWeightChange,
   handleBabySexChange,
   totalIFA,
@@ -106,7 +111,7 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="postnatal">
-          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} editingPostpartumIndex={editingPostpartumIndex} startEditPostpartumLog={startEditPostpartumLog} handlePncDateChange={handlePncDateChange} postpartumProgress={postpartumProgress} />
+          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} editingPostpartumIndex={editingPostpartumIndex} startEditPostpartumLog={startEditPostpartumLog} newPncContact={newPncContact} setNewPncContact={setNewPncContact} addPncContact={addPncContact} removePncContact={removePncContact} editingPncContactIndex={editingPncContactIndex} startEditPncContact={startEditPncContact} postpartumProgress={postpartumProgress} />
         </Tabs.Panel>
       </Tabs>
       <Button fullWidth mt="lg" onClick={handleSubmit} color={formData.manual_risk ? 'red' : 'teal'} size="md" loading={submitting} disabled={submitting}>

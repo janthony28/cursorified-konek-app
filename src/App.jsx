@@ -547,6 +547,11 @@ function MainApp({ session, onLogout }) {
     setEditingLabIndex(null);
     setEditingPostpartumIndex(null);
     setEditingPncContactIndex(null);
+    setNewSupp({ type: 'IFA', date: '', count: '' });
+    setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
+    setNewLab({ type: 'CBC', date: '', result: '' });
+    setNewPostpartumLog({ date: '', count: '', remarks: '' });
+    setNewPncContact({ date: '' });
     open();
   };
 
@@ -585,6 +590,11 @@ function MainApp({ session, onLogout }) {
     setEditingLabIndex(null);
     setEditingPostpartumIndex(null);
     setEditingPncContactIndex(null);
+    setNewSupp({ type: 'IFA', date: '', count: '' });
+    setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
+    setNewLab({ type: 'CBC', date: '', result: '' });
+    setNewPostpartumLog({ date: '', count: '', remarks: '' });
+    setNewPncContact({ date: '' });
     open();
   };
 

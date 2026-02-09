@@ -2,12 +2,37 @@ import { Paper, Box, Stack, Group, Grid, Input, NumberInput, TextInput, Table, B
 import { ArrowRight, Trash, Pencil } from 'lucide-react';
 import { formatDate } from '../../../lib/formatters';
 
+const isEditing = (editingVisitIndex) => editingVisitIndex != null;
+
 export default function PrenatalTab({ formData, setFormData, newVisit, setNewVisit, handleVisitDateChange, handleBMIChange, addVisitToList, removeVisit, editingVisitIndex, startEditVisit, nextTab }) {
+  const editing = isEditing(editingVisitIndex);
   return (
     <>
-      <Paper withBorder radius="md" overflow="hidden" mb="md">
-        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
-          <Text size="sm" fw={700} c="blue.9" align="center">Prenatal Visit</Text>
+      <style>{`
+        @keyframes prenatal-edit-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.35); }
+          50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        }
+      `}</style>
+      <Paper
+        withBorder
+        radius="md"
+        overflow="hidden"
+        mb="md"
+        style={{
+          borderLeft: editing ? '4px solid var(--mantine-color-green-6)' : undefined,
+          backgroundColor: editing ? 'var(--mantine-color-green-0)' : undefined,
+          animation: editing ? 'prenatal-edit-pulse 1.2s ease-out 2' : undefined,
+        }}
+      >
+        <Box
+          bg={editing ? 'green.1' : 'blue.1'}
+          p="xs"
+          style={{ borderBottom: '1px solid #dee2e6' }}
+        >
+          <Text size="sm" fw={700} c={editing ? 'green.8' : 'blue.9'} align="center">
+            {editing ? 'Editing visit — change values above, then click Update Visit' : 'Prenatal Visit'}
+          </Text>
         </Box>
         <Stack p="sm">
           <Group grow>

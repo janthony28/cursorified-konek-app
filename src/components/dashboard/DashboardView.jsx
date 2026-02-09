@@ -40,6 +40,12 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
       return aDate - bDate; // Older dates come first
     })
     .slice(0, 5); // Limit to top 5
+    const emergencyHotlines = [
+    { name: '24/7 EBD Emergency Health Hotline', number: '0999-222-6626' },
+    { name: "Mayor's Action Center", number: '723-1511' },
+    { name: 'Batangas Medical Center', number: '723-0911' },
+  ];
+
   const cardStyle = { 
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
     cursor: 'pointer',
@@ -51,13 +57,14 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
 
   return (
     <Stack gap="lg">
-      <Grid>
+      <Grid align="stretch">
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Paper 
             className="dashboard-card hover-lift" 
             p="xl" 
             radius="lg" 
             style={{ 
+              height: '100%',
               background: 'linear-gradient(135deg, #e6fcf5 0%, #ffffff 100%)',
               border: '1px solid rgba(12, 166, 120, 0.1)',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
@@ -95,22 +102,29 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
               boxShadow: '0 4px 6px -1px rgba(250, 82, 82, 0.15), 0 2px 4px -1px rgba(250, 82, 82, 0.1)',
             }}
           >
-            <Group mb="md" gap="xs">
-              <ThemeIcon color="red" variant="light" size="md" radius="md">
-                <Phone size={18} />
+            <Group mb="xs" gap="xs">
+              <ThemeIcon color="red" variant="light" size="sm" radius="md">
+                <Phone size={14} />
               </ThemeIcon>
-              <Text fw={700} c="red.9" size="sm" style={{ letterSpacing: '0.05em' }}>EMERGENCY HOTLINES</Text>
+              <Text fw={700} c="red.9" size="xs" style={{ letterSpacing: '0.05em' }}>EMERGENCY HOTLINES</Text>
             </Group>
-            <Stack gap="xs">
-              <Text size="sm" fw={600} c="dark.7">
-                City Health Office: <Text component="span" fw={400} c="dark.6">0912-345-6789</Text>
-              </Text>
-              <Text size="sm" fw={600} c="dark.7">
-                Batangas Med Center: <Text component="span" fw={400} c="dark.6">(043) 723-0165</Text>
-              </Text>
-              <Text size="sm" fw={600} c="dark.7">
-                Ambulance: <Text component="span" fw={400} c="dark.6">911</Text>
-              </Text>
+            <Stack gap={4}>
+              {emergencyHotlines.map(({ name, number }) => (
+                <Stack key={name} gap={0}>
+                  <Text size="xs" fw={600} c="dark.7" style={{ lineHeight: 1.3 }}>
+                    {name}
+                  </Text>
+                  <Text
+                    size="xs"
+                    fw={400}
+                    c="dark.6"
+                    component="span"
+                    style={{ whiteSpace: 'nowrap', display: 'block', lineHeight: 1.3 }}
+                  >
+                    {number}
+                  </Text>
+                </Stack>
+              ))}
             </Stack>
           </Paper>
         </Grid.Col>

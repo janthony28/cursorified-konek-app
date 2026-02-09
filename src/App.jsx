@@ -567,6 +567,7 @@ function MainApp({ session, onLogout }) {
       .filter(Boolean)
       .map((date) => ({ date }));
     cleanData.is_8anc_completed = (patient.is_8anc_completed === true || patient.is_8anc_completed === 'Yes') ? 'Yes' : 'No';
+    cleanData.td_completed_previously = (patient.td_completed_previously === true || patient.td_completed_previously === 'true' || String(patient.td_completed_previously) === 'true');
 
     setFormData({
       ...initialFormState,
@@ -679,7 +680,6 @@ function MainApp({ session, onLogout }) {
 
       // UI-only / helper fields that should not be sent to Supabase
       delete rawPayload.delivery_attendant_specify;
-      delete rawPayload.td_completed_previously;
       delete rawPayload.delivery_place_specify;
       delete rawPayload.pnc_contacts;
       if (isEditing) delete rawPayload.created_by;

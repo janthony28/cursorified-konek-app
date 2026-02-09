@@ -34,6 +34,8 @@ export async function exportToExcel(patients, options = {}) {
   const colCount = 21;
   sheet.columns = Array.from({ length: colCount }, () => ({ width: 10 }));
   sheet.getColumn(1).width = 50;
+  sheet.getColumn(2).width = 14;
+  sheet.getColumn(3).width = 14;
   sheet.getColumn(8).width = 50;
   sheet.getColumn(14).width = 50;
 
@@ -316,22 +318,25 @@ export async function exportToExcel(patients, options = {}) {
 
   row3('18. Number of deliveries', 'deliveries', '21. Number of health facility-based deliveries', null, '', null);
   row3('19. Number of live births', 'liveBirths', '   a. Number of deliveries in public health facility', 'facility_public', '', null);
-  // 19a. Normal birth weight + 21b. Private facility
+  // 19a. Normal birth weight (total only) + 21b. Private facility
   {
     const rw = sheet.getRow(r);
-    rw.getCell(1).value = '   a. Number of live births with normal birth weight'; rw.getCell(1).style = styles.normalCell;
-    setData(r, 2, 'lb_normal');
+    rw.getCell(1).value = '   a. Number of live births with normal birth weight (total)'; rw.getCell(1).style = styles.normalCell;
+    rw.getCell(2).value = data.lb_normal?.total ?? 0; rw.getCell(2).style = styles.centeredCell;
+    rw.getCell(3).value = ''; rw.getCell(3).style = styles.centeredCell;
+    rw.getCell(4).value = ''; rw.getCell(4).style = styles.centeredCell;
+    rw.getCell(5).value = ''; rw.getCell(5).style = styles.centeredCell;
     rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
     setMiddle(rw, r, '   b. Number of deliveries in private health facility', 'facility_private');
     fillRight(rw);
     r++;
   }
-  // 19b. Low birth weight – sub-header (Male / Female columns) + 22. Non-facility
+  // 19b. Low birth weight – sub-header (Male / Female totals) + 22. Non-facility
   {
     const rw = sheet.getRow(r);
     rw.getCell(1).value = '   b. Number of live births with low birth weight'; rw.getCell(1).style = styles.normalCell;
-    rw.getCell(2).value = 'Male'; rw.getCell(2).style = styles.centeredCell;
-    rw.getCell(3).value = 'Female'; rw.getCell(3).style = styles.centeredCell;
+    rw.getCell(2).value = 'Male (total)'; rw.getCell(2).style = styles.centeredCell;
+    rw.getCell(3).value = 'Female (total)'; rw.getCell(3).style = styles.centeredCell;
     rw.getCell(4).value = ''; rw.getCell(4).style = styles.centeredCell;
     rw.getCell(5).value = ''; rw.getCell(5).style = styles.centeredCell;
     rw.getCell(6).value = ''; rw.getCell(6).style = styles.normalCell;
@@ -355,7 +360,7 @@ export async function exportToExcel(patients, options = {}) {
   // 19c. Unknown birth weight – total only (no sex / age breakdown) + 23a. Vaginal
   {
     const rw = sheet.getRow(r);
-    rw.getCell(1).value = '   c. Number of live births with unknown birth weight'; rw.getCell(1).style = styles.normalCell;
+    rw.getCell(1).value = '   c. Number of live births with unknown birth weight (total)'; rw.getCell(1).style = styles.normalCell;
     rw.getCell(2).value = (data.lb_unknown_m?.total ?? 0) + (data.lb_unknown_f?.total ?? 0); rw.getCell(2).style = styles.centeredCell;
     rw.getCell(3).value = ''; rw.getCell(3).style = styles.centeredCell;
     rw.getCell(4).value = ''; rw.getCell(4).style = styles.centeredCell;

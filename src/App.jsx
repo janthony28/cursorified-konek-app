@@ -319,21 +319,19 @@ function MainApp({ session, onLogout }) {
     });
   };
 
+  /** When editing a visit, get the date bounds from its position in chronological order (previous and next visit by date). */
+  const getVisitDateBoundsForEditing = (visits, editingIndex) => {
+    const withIndex = (visits || []).map((v, i) => ({ visit: v, index: i }));
+    const sorted = [...withIndex].sort((a, b) => (a.visit?.date || '').localeCompare(b.visit?.date || ''));
+    const p = sorted.findIndex(({ index }) => index === editingIndex);
+    if (p === -1) return { previousDate: null, nextDate: null };
+    const previousDate = p > 0 ? sorted[p - 1].visit?.date || null : null;
+    const nextDate = p < sorted.length - 1 ? sorted[p + 1].visit?.date || null : null;
+    return { previousDate, nextDate };
+  };
+
   const handleVisitDateChange = (e) => {
     const date = e.target.value;
-    if (date) {
-      const latest = getLatestPrenatalVisit(formData.prenatal_visits);
-      if (latest?.date && date <= latest.date) {
-        notifications.show({ title: 'Invalid date', message: `Visit date must be after the latest visit (${formatDate(latest.date)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-        return;
-      }
-      const rawWeeks = getRawWeeksAOG(formData.lmp, date);
-      if (rawWeeks !== null && rawWeeks > 43) {
-        notifications.show({ title: 'Invalid visit date', message: 'Visit date cannot be beyond 43 weeks AOG. Please choose another date.', color: 'red' });
-        setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
-        return;
-      }
-    }
     const { aog, trimester } = calculateAOGData(formData.lmp, date);
     setNewVisit({ ...newVisit, date, aog, trimester });
   };
@@ -364,10 +362,22 @@ function MainApp({ session, onLogout }) {
     }
     if (newVisit.trimester === '1st Trimester' && (newVisit.weight === '' || newVisit.weight == null)) return notifications.show({ title: 'Required', message: 'Weight is required for 1st trimester visits.', color: 'red' });
     const otherVisits = editingVisitIndex != null ? formData.prenatal_visits.filter((_, idx) => idx !== editingVisitIndex) : formData.prenatal_visits;
-    const latest = getLatestPrenatalVisit(otherVisits);
-    if (latest?.date && newVisit.date <= latest.date) {
-      notifications.show({ title: 'Invalid date', message: `Visit date must be after the latest visit (${formatDate(latest.date)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-      return;
+    if (editingVisitIndex != null) {
+      const { previousDate, nextDate } = getVisitDateBoundsForEditing(formData.prenatal_visits, editingVisitIndex);
+      if (previousDate != null && newVisit.date <= previousDate) {
+        notifications.show({ title: 'Invalid date', message: `Visit date must be after the previous visit (${formatDate(previousDate)}).`, color: 'red' });
+        return;
+      }
+      if (nextDate != null && newVisit.date >= nextDate) {
+        notifications.show({ title: 'Invalid date', message: `Visit date must be before the next visit (${formatDate(nextDate)}).`, color: 'red' });
+        return;
+      }
+    } else {
+      const latest = getLatestPrenatalVisit(otherVisits);
+      if (latest?.date && newVisit.date <= latest.date) {
+        notifications.show({ title: 'Invalid date', message: `Visit date must be after the latest visit (${formatDate(latest.date)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
+        return;
+      }
     }
     if (editingVisitIndex != null) {
       const next = [...formData.prenatal_visits];
@@ -388,16 +398,43 @@ function MainApp({ session, onLogout }) {
     setNewVisit({ date: v.date || '', aog: v.aog || '', trimester: v.trimester || '', weight: v.weight || '', height: v.height || '', bmi: v.bmi || '', bmi_category: v.bmi_category || '', remarks: v.remarks || '' });
     setEditingVisitIndex(i);
   };
+  const cancelEditVisit = () => {
+    setEditingVisitIndex(null);
+    setNewVisit({ date: '', aog: '', trimester: '', weight: '', height: '', bmi: '', bmi_category: '', remarks: '' });
+  };
+
+  /** When editing a log (supplement or postpartum), get date bounds from its position in chronological order. */
+  const getLogDateBoundsForEditing = (items, editingIndex) => {
+    const list = items || [];
+    const withIndex = list.map((item, i) => ({ item, index: i }));
+    const sorted = [...withIndex].sort((a, b) => String(a.item?.date || '').localeCompare(String(b.item?.date || '')));
+    const p = sorted.findIndex(({ index }) => index === editingIndex);
+    if (p === -1) return { previousDate: null, nextDate: null };
+    const previousDate = p > 0 ? sorted[p - 1].item?.date || null : null;
+    const nextDate = p < sorted.length - 1 ? sorted[p + 1].item?.date || null : null;
+    return { previousDate, nextDate };
+  };
 
   const addSupplement = () => {
     if (!newSupp.date || !newSupp.count) return notifications.show({ title: 'Required', message: 'Please enter date and count.', color: 'red' });
     const list = newSupp.type === 'IFA' ? formData.supplements_ifa : newSupp.type === 'Calcium' ? formData.supplements_calcium : formData.supplements_mms;
-    const otherList = editingSupp != null && editingSupp.type === newSupp.type ? list.filter((_, i) => i !== editingSupp.index) : list;
-    const latestDate = otherList.length ? otherList.reduce((max, item) => (item.date > max ? item.date : max), otherList[0].date) : null;
-    if (latestDate && newSupp.date <= latestDate) {
-      const label = newSupp.type === 'IFA' ? 'IFA' : newSupp.type === 'Calcium' ? 'Calcium' : 'MMS';
-      notifications.show({ title: 'Invalid date', message: `${label} log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-      return;
+    const label = newSupp.type === 'IFA' ? 'IFA' : newSupp.type === 'Calcium' ? 'Calcium' : 'MMS';
+    if (editingSupp != null && editingSupp.type === newSupp.type) {
+      const { previousDate, nextDate } = getLogDateBoundsForEditing(list, editingSupp.index);
+      if (previousDate != null && newSupp.date <= previousDate) {
+        notifications.show({ title: 'Invalid date', message: `${label} log date must be after the previous log (${formatDate(previousDate)}).`, color: 'red' });
+        return;
+      }
+      if (nextDate != null && newSupp.date >= nextDate) {
+        notifications.show({ title: 'Invalid date', message: `${label} log date must be before the next log (${formatDate(nextDate)}).`, color: 'red' });
+        return;
+      }
+    } else {
+      const latestDate = list.length ? list.reduce((max, item) => (item.date > max ? item.date : max), list[0].date) : null;
+      if (latestDate && newSupp.date <= latestDate) {
+        notifications.show({ title: 'Invalid date', message: `${label} log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
+        return;
+      }
     }
     const entry = { date: newSupp.date, count: newSupp.count };
     if (editingSupp != null && editingSupp.type === newSupp.type) {
@@ -426,6 +463,10 @@ function MainApp({ session, onLogout }) {
     setNewSupp({ type, date: s.date || '', count: s.count ?? '' });
     setEditingSupp({ type, index });
   };
+  const cancelEditSupplement = () => {
+    setEditingSupp(null);
+    setNewSupp({ type: newSupp.type || 'IFA', date: '', count: '' });
+  };
 
   const addLabLog = () => {
     if (!newLab.date) return notifications.show({ title: 'Required', message: 'Date is required.', color: 'red' });
@@ -450,6 +491,10 @@ function MainApp({ session, onLogout }) {
     setNewLab({ type: log.type || 'CBC', date: log.date || '', result: log.result || '' });
     setEditingLabIndex(index);
   };
+  const cancelEditLabLog = () => {
+    setEditingLabIndex(null);
+    setNewLab({ type: newLab.type || 'CBC', date: '', result: '' });
+  };
 
   const getIfaCompletionDate = (logList) => {
     const sorted = [...(logList || [])].sort((a, b) => String(a?.date || '').localeCompare(String(b?.date || '')));
@@ -464,11 +509,22 @@ function MainApp({ session, onLogout }) {
   const addPostpartumLog = () => {
     if (!newPostpartumLog.date || !newPostpartumLog.count) return notifications.show({ title: 'Required', message: 'Date and count are required.', color: 'red' });
     const logs = formData.postpartum_logs || [];
-    const otherLogs = editingPostpartumIndex != null ? logs.filter((_, i) => i !== editingPostpartumIndex) : logs;
-    const latestDate = otherLogs.length ? otherLogs.reduce((max, item) => (item.date > max ? item.date : max), otherLogs[0].date) : null;
-    if (latestDate && newPostpartumLog.date <= latestDate) {
-      notifications.show({ title: 'Invalid date', message: `Postpartum log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
-      return;
+    if (editingPostpartumIndex != null) {
+      const { previousDate, nextDate } = getLogDateBoundsForEditing(logs, editingPostpartumIndex);
+      if (previousDate != null && newPostpartumLog.date <= previousDate) {
+        notifications.show({ title: 'Invalid date', message: `Postpartum log date must be after the previous log (${formatDate(previousDate)}).`, color: 'red' });
+        return;
+      }
+      if (nextDate != null && newPostpartumLog.date >= nextDate) {
+        notifications.show({ title: 'Invalid date', message: `Postpartum log date must be before the next log (${formatDate(nextDate)}).`, color: 'red' });
+        return;
+      }
+    } else {
+      const latestDate = logs.length ? logs.reduce((max, item) => (item.date > max ? item.date : max), logs[0].date) : null;
+      if (latestDate && newPostpartumLog.date <= latestDate) {
+        notifications.show({ title: 'Invalid date', message: `Postpartum log date must be after the latest log (${formatDate(latestDate)}). You cannot add a date that is the same as or before the previous one.`, color: 'red' });
+        return;
+      }
     }
 
     let updatedLogs;
@@ -502,15 +558,46 @@ function MainApp({ session, onLogout }) {
     setNewPostpartumLog({ date: log.date || '', count: log.count ?? '', remarks: log.remarks || '' });
     setEditingPostpartumIndex(index);
   };
+  const cancelEditPostpartumLog = () => {
+    setEditingPostpartumIndex(null);
+    setNewPostpartumLog({ date: '', count: '', remarks: '' });
+  };
+
+  /** When editing a PNC contact, get date bounds from its position in chronological order. */
+  const getPncContactDateBoundsForEditing = (contacts, editingIndex) => {
+    const list = contacts || [];
+    const withIndex = list.map((c, i) => ({ contact: c, index: i }));
+    const sorted = [...withIndex].sort((a, b) => String(a.contact?.date || '').localeCompare(String(b.contact?.date || '')));
+    const p = sorted.findIndex(({ index }) => index === editingIndex);
+    if (p === -1) return { previousDate: null, nextDate: null };
+    const previousDate = p > 0 ? sorted[p - 1].contact?.date || null : null;
+    const nextDate = p < sorted.length - 1 ? sorted[p + 1].contact?.date || null : null;
+    return { previousDate, nextDate };
+  };
+
+  const handlePncContactDateChange = (e) => {
+    setNewPncContact({ ...newPncContact, date: e.target.value });
+  };
 
   const addPncContact = () => {
     if (!newPncContact.date) return notifications.show({ title: 'Required', message: 'Please enter contact date.', color: 'red' });
     const list = formData.pnc_contacts || [];
-    const otherList = editingPncContactIndex != null ? list.filter((_, i) => i !== editingPncContactIndex) : list;
-    const latestDate = otherList.length ? otherList.reduce((max, c) => (c.date > max ? c.date : max), otherList[0].date) : null;
-    if (latestDate && newPncContact.date <= latestDate) {
-      notifications.show({ title: 'Invalid date', message: `Contact date must be after the latest contact (${formatDate(latestDate)}).`, color: 'red' });
-      return;
+    if (editingPncContactIndex != null) {
+      const { previousDate, nextDate } = getPncContactDateBoundsForEditing(list, editingPncContactIndex);
+      if (previousDate != null && newPncContact.date <= previousDate) {
+        notifications.show({ title: 'Invalid date', message: `Contact date must be after the previous contact (${formatDate(previousDate)}).`, color: 'red' });
+        return;
+      }
+      if (nextDate != null && newPncContact.date >= nextDate) {
+        notifications.show({ title: 'Invalid date', message: `Contact date must be before the next contact (${formatDate(nextDate)}).`, color: 'red' });
+        return;
+      }
+    } else {
+      const latestDate = list.length ? list.reduce((max, c) => (c.date > max ? c.date : max), list[0].date) : null;
+      if (latestDate && newPncContact.date <= latestDate) {
+        notifications.show({ title: 'Invalid date', message: `Contact date must be after the latest contact (${formatDate(latestDate)}).`, color: 'red' });
+        return;
+      }
     }
     const contact = { date: newPncContact.date };
     if (editingPncContactIndex != null) {
@@ -531,6 +618,10 @@ function MainApp({ session, onLogout }) {
     const c = (formData.pnc_contacts || [])[i] || {};
     setNewPncContact({ date: c.date || '' });
     setEditingPncContactIndex(i);
+  };
+  const cancelEditPncContact = () => {
+    setEditingPncContactIndex(null);
+    setNewPncContact({ date: '' });
   };
 
   const handleAddClick = () => {
@@ -801,24 +892,30 @@ function MainApp({ session, onLogout }) {
         removeVisit={removeVisit}
         editingVisitIndex={editingVisitIndex}
         startEditVisit={startEditVisit}
+        cancelEditVisit={cancelEditVisit}
         addSupplement={addSupplement}
         removeSupplement={removeSupplement}
         editingSupp={editingSupp}
         startEditSupplement={startEditSupplement}
+        cancelEditSupplement={cancelEditSupplement}
         addLabLog={addLabLog}
         removeLabLog={removeLabLog}
         editingLabIndex={editingLabIndex}
         startEditLabLog={startEditLabLog}
+        cancelEditLabLog={cancelEditLabLog}
         addPostpartumLog={addPostpartumLog}
         removePostpartumLog={removePostpartumLog}
         editingPostpartumIndex={editingPostpartumIndex}
         startEditPostpartumLog={startEditPostpartumLog}
+        cancelEditPostpartumLog={cancelEditPostpartumLog}
         newPncContact={newPncContact}
         setNewPncContact={setNewPncContact}
+        handlePncContactDateChange={handlePncContactDateChange}
         addPncContact={addPncContact}
         removePncContact={removePncContact}
         editingPncContactIndex={editingPncContactIndex}
         startEditPncContact={startEditPncContact}
+        cancelEditPncContact={cancelEditPncContact}
         handleBirthWeightChange={handleBirthWeightChange}
         handleBabySexChange={handleBabySexChange}
         totalIFA={totalIFA}

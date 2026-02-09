@@ -2,12 +2,16 @@ import { Paper, Box, Stack, Group, Input, Select, Button, Table, ActionIcon, Tex
 import { ArrowRight, Plus, Trash, Pencil } from 'lucide-react';
 import { formatDate } from '../../../lib/formatters';
 
-export default function LabsTab({ formData, setFormData, newLab, setNewLab, addLabLog, removeLabLog, editingLabIndex, startEditLabLog, nextTab }) {
+export default function LabsTab({ formData, setFormData, newLab, setNewLab, addLabLog, removeLabLog, editingLabIndex, startEditLabLog, cancelEditLabLog, nextTab }) {
+  const labLogs = formData.lab_logs || [];
+  const labCount = labLogs.length;
   return (
     <>
-      <Paper withBorder radius="md" overflow="hidden">
-        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
-          <Text size="sm" fw={700} c="blue.9" align="center">Laboratory Test Results</Text>
+      <Paper withBorder radius="md" overflow="hidden" style={editingLabIndex != null ? { borderLeft: '4px solid var(--mantine-color-green-6)', backgroundColor: 'var(--mantine-color-green-0)' } : undefined}>
+        <Box bg={editingLabIndex != null ? 'green.1' : 'blue.1'} p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Text size="sm" fw={700} c={editingLabIndex != null ? 'green.8' : 'blue.9'} align="center">
+            {editingLabIndex != null ? `Editing result ${editingLabIndex + 1} of ${labCount}` : 'Laboratory Test Results'}
+          </Text>
         </Box>
         <Stack p="sm">
           <Group align="end">
@@ -25,7 +29,10 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
               value={newLab.result || null}
               onChange={(v) => setNewLab({ ...newLab, result: v ?? '' })}
             />
-            <Button onClick={addLabLog} leftSection={<Plus size={16} />}>{editingLabIndex != null ? 'Update Result' : 'Add Result'}</Button>
+            <Group gap="xs">
+              <Button onClick={addLabLog} leftSection={<Plus size={16} />}>{editingLabIndex != null ? `Update Result (${editingLabIndex + 1} of ${labCount})` : 'Add Result'}</Button>
+              {editingLabIndex != null && <Button variant="subtle" color="gray" onClick={cancelEditLabLog}>Cancel</Button>}
+            </Group>
           </Group>
           <Table striped withTableBorder>
             <Table.Thead><Table.Tr><Table.Th>Test</Table.Th><Table.Th>Date</Table.Th><Table.Th>Result</Table.Th><Table.Th></Table.Th></Table.Tr></Table.Thead>
@@ -35,8 +42,9 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
                 .sort((a, b) => (b.log.date || '').localeCompare(a.log.date || ''))
                 .map(({ log, originalIndex }) => {
                 const isBad = ['Positive', 'With Anemia'].includes(log.result);
+                const isEditingRow = originalIndex === editingLabIndex;
                 return (
-                  <Table.Tr key={originalIndex} bg={isBad ? 'red.1' : undefined}>
+                  <Table.Tr key={originalIndex} bg={isEditingRow ? 'green.0' : isBad ? 'red.1' : undefined} style={isEditingRow ? { borderLeft: '3px solid var(--mantine-color-green-6)' } : undefined}>
                     <Table.Td fw={500}>{log.type}</Table.Td>
                     <Table.Td>{formatDate(log.date)}</Table.Td>
                     <Table.Td>
@@ -51,7 +59,7 @@ export default function LabsTab({ formData, setFormData, newLab, setNewLab, addL
                   </Table.Tr>
                 );
               })}
-              {(formData.lab_logs || []).length === 0 && <Table.Tr><Table.Td colSpan={4} align="center" c="dimmed">No lab results added yet.</Table.Td></Table.Tr>}
+              {labLogs.length === 0 && <Table.Tr><Table.Td colSpan={4} align="center" c="dimmed">No lab results added yet.</Table.Td></Table.Tr>}
             </Table.Tbody>
           </Table>
         </Stack>

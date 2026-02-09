@@ -4,7 +4,7 @@ import { formatDate } from '../../../lib/formatters';
 
 const isEditing = (editingVisitIndex) => editingVisitIndex != null;
 
-export default function PrenatalTab({ formData, setFormData, newVisit, setNewVisit, handleVisitDateChange, handleBMIChange, addVisitToList, removeVisit, editingVisitIndex, startEditVisit, nextTab }) {
+export default function PrenatalTab({ formData, setFormData, newVisit, setNewVisit, handleVisitDateChange, handleBMIChange, addVisitToList, removeVisit, editingVisitIndex, startEditVisit, cancelEditVisit, nextTab }) {
   const editing = isEditing(editingVisitIndex);
   return (
     <>
@@ -31,7 +31,7 @@ export default function PrenatalTab({ formData, setFormData, newVisit, setNewVis
           style={{ borderBottom: '1px solid #dee2e6' }}
         >
           <Text size="sm" fw={700} c={editing ? 'green.8' : 'blue.9'} align="center">
-            {editing ? 'Editing visit — change values above, then click Update Visit' : 'Prenatal Visit'}
+            {editing ? `Editing visit ${editingVisitIndex + 1} of ${formData.prenatal_visits.length} — change values above, then click Update Visit` : 'Prenatal Visit'}
           </Text>
         </Box>
         <Stack p="sm">
@@ -48,7 +48,10 @@ export default function PrenatalTab({ formData, setFormData, newVisit, setNewVis
               <Grid.Col span={3}> <TextInput label="Category" readOnly value={newVisit.bmi_category} /> </Grid.Col>
             </Grid>
           )}
-          <Button fullWidth variant="outline" color="teal" onClick={addVisitToList}>{editingVisitIndex != null ? 'Update Visit' : '+ Add Visit'}</Button>
+          <Group gap="xs">
+            <Button flex={1} variant="outline" color="teal" onClick={addVisitToList}>{editingVisitIndex != null ? `Update Visit (${editingVisitIndex + 1} of ${formData.prenatal_visits.length})` : '+ Add Visit'}</Button>
+            {editingVisitIndex != null && <Button variant="subtle" color="gray" onClick={cancelEditVisit}>Cancel</Button>}
+          </Group>
         </Stack>
       </Paper>
       <Paper withBorder radius="md" overflow="hidden">
@@ -61,7 +64,7 @@ export default function PrenatalTab({ formData, setFormData, newVisit, setNewVis
               <Table.Thead><Table.Tr><Table.Th>Date</Table.Th><Table.Th>AOG</Table.Th><Table.Th>Trimester</Table.Th><Table.Th>BMI</Table.Th><Table.Th>Action</Table.Th></Table.Tr></Table.Thead>
               <Table.Tbody>
                 {formData.prenatal_visits.map((v, i) => (
-                  <Table.Tr key={i}>
+                  <Table.Tr key={i} bg={i === editingVisitIndex ? 'green.0' : undefined} style={i === editingVisitIndex ? { borderLeft: '3px solid var(--mantine-color-green-6)' } : undefined}>
                     <Table.Td>{formatDate(v.date)}</Table.Td>
                     <Table.Td>{v.aog}</Table.Td>
                     <Table.Td>{v.trimester || '—'}</Table.Td>

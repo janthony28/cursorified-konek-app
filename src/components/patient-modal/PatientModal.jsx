@@ -38,24 +38,30 @@ export default function PatientModal({
   removeVisit,
   editingVisitIndex,
   startEditVisit,
+  cancelEditVisit,
   addSupplement,
   removeSupplement,
   editingSupp,
   startEditSupplement,
+  cancelEditSupplement,
   addLabLog,
   removeLabLog,
   editingLabIndex,
   startEditLabLog,
+  cancelEditLabLog,
   addPostpartumLog,
   removePostpartumLog,
   editingPostpartumIndex,
   startEditPostpartumLog,
+  cancelEditPostpartumLog,
   newPncContact,
   setNewPncContact,
+  handlePncContactDateChange,
   addPncContact,
   removePncContact,
   editingPncContactIndex,
   startEditPncContact,
+  cancelEditPncContact,
   handleBirthWeightChange,
   handleBabySexChange,
   totalIFA,
@@ -83,7 +89,7 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="prenatal">
-          <PrenatalTab formData={formData} setFormData={setFormData} newVisit={newVisit} setNewVisit={setNewVisit} handleVisitDateChange={handleVisitDateChange} handleBMIChange={handleBMIChange} addVisitToList={addVisitToList} removeVisit={removeVisit} editingVisitIndex={editingVisitIndex} startEditVisit={startEditVisit} nextTab={nextTab} />
+          <PrenatalTab formData={formData} setFormData={setFormData} newVisit={newVisit} setNewVisit={setNewVisit} handleVisitDateChange={handleVisitDateChange} handleBMIChange={handleBMIChange} addVisitToList={addVisitToList} removeVisit={removeVisit} editingVisitIndex={editingVisitIndex} startEditVisit={startEditVisit} cancelEditVisit={cancelEditVisit} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="immunization">
@@ -91,11 +97,11 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="supplementation">
-          <SupplementationTab formData={formData} setFormData={setFormData} newSupp={newSupp} setNewSupp={setNewSupp} addSupplement={addSupplement} removeSupplement={removeSupplement} editingSupp={editingSupp} startEditSupplement={startEditSupplement} totalIFA={totalIFA} totalMMS={totalMMS} ifaProgress={ifaProgress} nextTab={nextTab} />
+          <SupplementationTab formData={formData} setFormData={setFormData} newSupp={newSupp} setNewSupp={setNewSupp} addSupplement={addSupplement} removeSupplement={removeSupplement} editingSupp={editingSupp} startEditSupplement={startEditSupplement} cancelEditSupplement={cancelEditSupplement} totalIFA={totalIFA} totalMMS={totalMMS} ifaProgress={ifaProgress} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="labs">
-          <LabsTab formData={formData} setFormData={setFormData} newLab={newLab} setNewLab={setNewLab} addLabLog={addLabLog} removeLabLog={removeLabLog} editingLabIndex={editingLabIndex} startEditLabLog={startEditLabLog} nextTab={nextTab} />
+          <LabsTab formData={formData} setFormData={setFormData} newLab={newLab} setNewLab={setNewLab} addLabLog={addLabLog} removeLabLog={removeLabLog} editingLabIndex={editingLabIndex} startEditLabLog={startEditLabLog} cancelEditLabLog={cancelEditLabLog} nextTab={nextTab} />
         </Tabs.Panel>
 
         <Tabs.Panel value="delivery">
@@ -111,7 +117,7 @@ export default function PatientModal({
         </Tabs.Panel>
 
         <Tabs.Panel value="postnatal">
-          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} editingPostpartumIndex={editingPostpartumIndex} startEditPostpartumLog={startEditPostpartumLog} newPncContact={newPncContact} setNewPncContact={setNewPncContact} addPncContact={addPncContact} removePncContact={removePncContact} editingPncContactIndex={editingPncContactIndex} startEditPncContact={startEditPncContact} postpartumProgress={postpartumProgress} />
+          <PostnatalTab formData={formData} setFormData={setFormData} newPostpartumLog={newPostpartumLog} setNewPostpartumLog={setNewPostpartumLog} addPostpartumLog={addPostpartumLog} removePostpartumLog={removePostpartumLog} editingPostpartumIndex={editingPostpartumIndex} startEditPostpartumLog={startEditPostpartumLog} cancelEditPostpartumLog={cancelEditPostpartumLog} newPncContact={newPncContact} setNewPncContact={setNewPncContact} handlePncContactDateChange={handlePncContactDateChange} addPncContact={addPncContact} removePncContact={removePncContact} editingPncContactIndex={editingPncContactIndex} startEditPncContact={startEditPncContact} cancelEditPncContact={cancelEditPncContact} postpartumProgress={postpartumProgress} />
         </Tabs.Panel>
       </Tabs>
       <Button fullWidth mt="lg" onClick={handleSubmit} color={formData.manual_risk ? 'red' : 'teal'} size="md" loading={submitting} disabled={submitting}>

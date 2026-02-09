@@ -13,11 +13,14 @@ export default function PostnatalTab({
   startEditPostpartumLog,
   newPncContact,
   setNewPncContact,
+  handlePncContactDateChange,
   addPncContact,
   removePncContact,
   editingPncContactIndex,
   startEditPncContact,
+  cancelEditPncContact,
   postpartumProgress,
+  cancelEditPostpartumLog,
 }) {
   const pncContacts = formData.pnc_contacts || [];
   const pncCount = pncContacts.length;
@@ -28,17 +31,22 @@ export default function PostnatalTab({
   return (
     <Grid grow>
       <Grid.Col span={5}>
-        <Paper withBorder radius="md" overflow="hidden" h="100%">
-          <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
-            <Text size="sm" fw={700} c="blue.9" align="center">Date of Postnatal Care (4PNC)</Text>
+        <Paper withBorder radius="md" overflow="hidden" h="100%" style={editingPncContactIndex != null ? { borderLeft: '4px solid var(--mantine-color-green-6)', backgroundColor: 'var(--mantine-color-green-0)' } : undefined}>
+          <Box bg={editingPncContactIndex != null ? 'green.1' : 'blue.1'} p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+            <Text size="sm" fw={700} c={editingPncContactIndex != null ? 'green.8' : 'blue.9'} align="center">
+              {editingPncContactIndex != null ? `Editing contact ${editingPncContactIndex + 1} of ${pncCount}` : 'Date of Postnatal Care (4PNC)'}
+            </Text>
           </Box>
           <Stack p="sm" gap="sm">
             <Group grow>
               <Input.Wrapper label="Contact Date">
-                <Input type="date" value={newPncContact.date || ''} onChange={(e) => setNewPncContact({ ...newPncContact, date: e.target.value })} />
+                <Input type="date" value={newPncContact.date || ''} onChange={handlePncContactDateChange} />
               </Input.Wrapper>
             </Group>
-            <Button fullWidth variant="outline" color="teal" onClick={addPncContact}>{editingPncContactIndex != null ? 'Update Contact' : '+ Add Contact'}</Button>
+            <Group gap="xs">
+              <Button flex={1} variant="outline" color="teal" onClick={addPncContact}>{editingPncContactIndex != null ? `Update Contact (${editingPncContactIndex + 1} of ${pncCount})` : '+ Add Contact'}</Button>
+              {editingPncContactIndex != null && <Button variant="subtle" color="gray" onClick={cancelEditPncContact}>Cancel</Button>}
+            </Group>
             <Text size="xs" c="dimmed">Only the first 4 contacts (by date) are recorded in the report.</Text>
             <Paper withBorder radius="sm" p="xs">
               <Text size="xs" fw={700} c="dimmed" mb={4}>Contact History ({pncCount})</Text>
@@ -46,7 +54,7 @@ export default function PostnatalTab({
                 <Table striped withTableBorder>
                   <Table.Tbody>
                     {pncContacts.map((c, i) => (
-                      <Table.Tr key={i}>
+                      <Table.Tr key={i} bg={i === editingPncContactIndex ? 'green.0' : undefined} style={i === editingPncContactIndex ? { borderLeft: '3px solid var(--mantine-color-green-6)' } : undefined}>
                         <Table.Td>{formatDate(c.date)}</Table.Td>
                         <Table.Td>
                           <Group gap="xs">
@@ -70,9 +78,11 @@ export default function PostnatalTab({
       </Grid.Col>
 
       <Grid.Col span={7}>
-        <Paper withBorder radius="md" overflow="hidden" h="100%">
-          <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
-            <Text size="sm" fw={700} c="blue.9" align="center">Postpartum Supplementation</Text>
+        <Paper withBorder radius="md" overflow="hidden" h="100%" style={editingPostpartumIndex != null ? { borderLeft: '4px solid var(--mantine-color-green-6)', backgroundColor: 'var(--mantine-color-green-0)' } : undefined}>
+          <Box bg={editingPostpartumIndex != null ? 'green.1' : 'blue.1'} p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+            <Text size="sm" fw={700} c={editingPostpartumIndex != null ? 'green.8' : 'blue.9'} align="center">
+              {editingPostpartumIndex != null ? `Editing postpartum log ${editingPostpartumIndex + 1} of ${(formData.postpartum_logs || []).length}` : 'Postpartum Supplementation'}
+            </Text>
           </Box>
           <Stack p="sm" gap="md">
             <Box p="xs" bg="gray.0" style={{ borderRadius: '4px' }}>
@@ -88,14 +98,17 @@ export default function PostnatalTab({
                   <NumberInput placeholder="Tabs" value={newPostpartumLog.count} onChange={(v) => setNewPostpartumLog({ ...newPostpartumLog, count: v })} />
                 </Group>
                 <Select placeholder="Remarks (Optional)" data={[{ value: 'Trans In', label: 'A - Trans In' }, { value: 'Trans Out', label: 'B - Trans Out before 4PNC' }]} value={newPostpartumLog.remarks} onChange={(v) => setNewPostpartumLog({ ...newPostpartumLog, remarks: v })} clearable />
-                <Button onClick={addPostpartumLog} size="xs" variant="light" fullWidth>{editingPostpartumIndex != null ? 'Update Log' : '+ Add Log'}</Button>
+                <Group gap={4}>
+                  <Button onClick={addPostpartumLog} size="xs" variant="light" flex={1}>{editingPostpartumIndex != null ? `Update Log (${editingPostpartumIndex + 1} of ${(formData.postpartum_logs || []).length})` : '+ Add Log'}</Button>
+                  {editingPostpartumIndex != null && <Button size="xs" variant="subtle" color="gray" onClick={cancelEditPostpartumLog}>Cancel</Button>}
+                </Group>
               </Stack>
 
               <Box mt="md" style={{ maxHeight: 120, overflowY: 'auto' }}>
                 <Table striped withTableBorder>
                   <Table.Tbody>
                     {(formData.postpartum_logs || []).map((log, i) => (
-                      <Table.Tr key={i}>
+                      <Table.Tr key={i} bg={i === editingPostpartumIndex ? 'green.0' : undefined} style={i === editingPostpartumIndex ? { borderLeft: '3px solid var(--mantine-color-green-6)' } : undefined}>
                         <Table.Td>{formatDate(log.date)}</Table.Td>
                         <Table.Td>{log.count} tabs</Table.Td>
                         <Table.Td style={{ fontSize: '10px' }}>{log.remarks}</Table.Td>

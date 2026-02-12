@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import Login from './Login';
 import SetPassword from './components/auth/SetPassword';
+import TermsAcceptanceModal from './components/legal/TermsAcceptanceModal';
+import { hasUserAcceptedTerms, setUserAcceptedTerms } from './lib/termsContent';
 import { getAgeGroup, calculateEDC, calculateAOGData, isPatientDue, parseOthers, getLatestPrenatalVisit, getRawWeeksAOG } from './lib/patientHelpers';
 import { formatDate } from './lib/formatters';
 import { getInitialFormState } from './lib/initialFormState';
@@ -26,6 +28,7 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showSetPassword, setShowSetPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => { setSession(session); setLoading(false); });
@@ -133,6 +136,30 @@ function App() {
   if (!session) return <Login />;
 
   if (showSetPassword) return <SetPassword onSuccess={handleSetPasswordSuccess} />;
+
+  const mustAcceptTerms = !hasUserAcceptedTerms(session.user?.id) && !termsAccepted;
+  if (mustAcceptTerms) {
+    return (
+      <Box
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(165deg, #e6fcf5 0%, #b2f2e2 30%, #f0f4f8 70%, #fff 100%)',
+          padding: 24,
+        }}
+      >
+        <TermsAcceptanceModal
+          opened={true}
+          onAccept={() => {
+            setUserAcceptedTerms(session.user.id);
+            setTermsAccepted(true);
+          }}
+        />
+      </Box>
+    );
+  }
 
   return <MainApp session={session} onLogout={clearSession} />;
 }

@@ -1,4 +1,18 @@
-import { Box, Container, Paper, Title, Text, Stack, Button, Group, Divider } from '@mantine/core';
+import { Box, Container, Paper, Title, Text, Stack, Button, Group, Divider, Tabs } from '@mantine/core';
+import { TERMS_EN, TERMS_TL } from '../../lib/termsContent';
+
+function TermsBody({ content }) {
+  return (
+    <Stack gap="md">
+      {content.sections.map((section, i) => (
+        <Box key={i}>
+          <Title order={5} c="teal.8" mb="xs">{section.heading}</Title>
+          <Text size="sm" c="dimmed" style={{ lineHeight: 1.7 }}>{section.body}</Text>
+        </Box>
+      ))}
+    </Stack>
+  );
+}
 
 export default function LegalPage({ onBack }) {
   return (
@@ -53,7 +67,7 @@ export default function LegalPage({ onBack }) {
           }}
         >
           <Group justify="space-between" mb="xl">
-            <Title order={2} c="teal.8">Terms of Use & Privacy Policy</Title>
+            <Title order={2} c="teal.8">Terms and Conditions & Privacy Policy</Title>
             {onBack && (
               <Button variant="subtle" color="teal" onClick={onBack} size="sm">
                 Back to login
@@ -63,22 +77,20 @@ export default function LegalPage({ onBack }) {
 
           <Stack gap="xl">
             <section>
-              <Title order={3} c="teal.7" mb="sm">Terms of Use</Title>
-              <Text size="sm" c="dimmed" style={{ lineHeight: 1.7 }}>
-                <strong>1. Acceptance.</strong> KONEK (KOmunidad NEtwork for Kalusugan) is a community health records platform for authorized health workers and administrators. By logging in and using this service, you agree to these Terms of Use.
-              </Text>
-              <Text size="sm" c="dimmed" mt="xs" style={{ lineHeight: 1.7 }}>
-                <strong>2. Purpose.</strong> This website is used to record, manage, and report maternal and child health data in support of local health programs. It supports prenatal care tracking, delivery and birth details, postnatal care (PNC), immunizations (e.g. Tetanus–Diptheria), supplementation (e.g. IFA, MMS, Calcium), lab logs, and related reporting consistent with field health service information systems (FHSIS).
-              </Text>
-              <Text size="sm" c="dimmed" mt="xs" style={{ lineHeight: 1.7 }}>
-                <strong>3. Authorized use.</strong> You may use KONEK only for lawful, authorized health and administrative purposes. You must not share your login credentials, access the system from unauthorized devices, or use the data for purposes unrelated to community health.
-              </Text>
-              <Text size="sm" c="dimmed" mt="xs" style={{ lineHeight: 1.7 }}>
-                <strong>4. Data accuracy and security.</strong> You are responsible for entering accurate information and for keeping your account secure. Do not enter data for persons without proper authorization or consent where required.
-              </Text>
-              <Text size="sm" c="dimmed" mt="xs" style={{ lineHeight: 1.7 }}>
-                <strong>5. Changes.</strong> We may update these Terms of Use from time to time. Continued use of the service after changes constitutes acceptance of the updated terms.
-              </Text>
+              <Tabs defaultValue="en" color="teal" variant="pills" radius="md">
+                <Tabs.List mb="md">
+                  <Tabs.Tab value="en">English</Tabs.Tab>
+                  <Tabs.Tab value="tl">Tagalog</Tabs.Tab>
+                </Tabs.List>
+                <Tabs.Panel value="en">
+                  <Title order={4} c="teal.7" mb="sm">{TERMS_EN.title}</Title>
+                  <TermsBody content={TERMS_EN} />
+                </Tabs.Panel>
+                <Tabs.Panel value="tl">
+                  <Title order={4} c="teal.7" mb="sm">{TERMS_TL.title}</Title>
+                  <TermsBody content={TERMS_TL} />
+                </Tabs.Panel>
+              </Tabs>
             </section>
 
             <Divider />

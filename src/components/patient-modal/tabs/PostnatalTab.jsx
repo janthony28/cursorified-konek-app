@@ -47,7 +47,13 @@ export default function PostnatalTab({
               <Button flex={1} variant="outline" color="teal" onClick={addPncContact}>{editingPncContactIndex != null ? `Update Contact (${editingPncContactIndex + 1} of ${pncCount})` : '+ Add Contact'}</Button>
               {editingPncContactIndex != null && <Button variant="subtle" color="gray" onClick={cancelEditPncContact}>Cancel</Button>}
             </Group>
-            <Text size="xs" c="dimmed">Only the first 4 contacts (by date) are recorded in the report.</Text>
+            <Text size="xs" fw={700} c="dimmed">Preferred contact dates</Text>
+            <Box component="ul" style={{ margin: 0, paddingLeft: 18, fontSize: 11, color: 'var(--mantine-color-dimmed)', lineHeight: 1.6 }}>
+              <li><Text span size="xs" fw={600} c="dark.5">Contact 1</Text> — within 24 hours after delivery</li>
+              <li><Text span size="xs" fw={600} c="dark.5">Contact 2</Text> — on day 3</li>
+              <li><Text span size="xs" fw={600} c="dark.5">Contact 3</Text> — between 7–14 days</li>
+              <li><Text span size="xs" fw={600} c="dark.5">Contact 4</Text> — 6 weeks after birth</li>
+            </Box>
             <Paper withBorder radius="sm" p="xs">
               <Text size="xs" fw={700} c="dimmed" mb={4}>Contact History ({pncCount})</Text>
               <Box style={{ maxHeight: 160, overflowY: 'auto' }}>

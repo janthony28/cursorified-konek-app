@@ -504,9 +504,11 @@ export async function exportMaternalTcl(patients, options = {}) {
   (patients || []).forEach((p, idx) => {
     const ageNum = Number(p.age || 0);
 
-    const fullName = [p.last_name, p.first_name, p.middle_name || p.middle_initial]
+    const baseName = [p.last_name, p.first_name]
       .filter(Boolean)
       .join(', ');
+    const middle = p.middle_name || p.middle_initial || '';
+    const fullName = middle ? `${baseName} ${middle}` : baseName;
     const addressParts = [p.address, p.sitio, p.barangay, p.city_municipality, p.province]
       .filter(Boolean);
     const address = addressParts.join(', ');

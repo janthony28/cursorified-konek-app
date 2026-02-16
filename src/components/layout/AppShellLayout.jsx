@@ -25,44 +25,57 @@ export default function AppShellLayout({
     >
       <AppShell.Header
         style={{
-          boxShadow: '0 2px 12px rgba(12, 166, 120, 0.08)',
-          borderBottom: '1px solid rgba(12, 166, 120, 0.12)',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(10px)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          borderBottom: '2px solid #22B14C',
+          background: '#22B14C',
+          color: 'white',
         }}
       >
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-          <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+          <Group gap={8} wrap="nowrap" style={{ minWidth: 0, alignItems: 'center' }}>
             <Burger 
               opened={mobileOpened} 
               onClick={toggleMobile} 
               hiddenFrom="sm" 
               size="sm"
-              color="teal"
+              color="white"
             />
             <Burger 
               opened={desktopOpened} 
               onClick={toggleDesktop} 
               visibleFrom="sm" 
               size="sm"
-              color="teal"
+              color="white"
             />
-            <img 
-              src="/konek-logo.png" 
-              alt="KONEK" 
-              style={{ 
-                height: 36, 
-                width: 'auto', 
-                flexShrink: 0,
-              }} 
-            />
-            <Text fw={700} size="md" component="span" style={{ letterSpacing: '-0.02em' }}>
-              <Text component="span" c="#0ca678" fw={700}>KO</Text>
-              <Text component="span" c="dark.6">munidad </Text>
-              <Text component="span" c="#0ca678" fw={700}>NE</Text>
-              <Text component="span" c="dark.6">twork for </Text>
-              <Text component="span" c="#0ca678" fw={700}>K</Text>
-              <Text component="span" c="dark.6">alusugan</Text>
+            <Group gap={4} wrap="nowrap" style={{ alignItems: 'center' }}>
+              <img 
+                src="/batangas-city-seal.png" 
+                alt="Batangas City Official Seal" 
+                style={{ 
+                  height: 44, 
+                  width: 'auto', 
+                  flexShrink: 0,
+                  display: 'block',
+                }} 
+              />
+              <img 
+                src="/konek-logo.png" 
+                alt="KONEK Logo" 
+                style={{ 
+                  height: 44, 
+                  width: 'auto', 
+                  flexShrink: 0,
+                  display: 'block',
+                }} 
+              />
+            </Group>
+            <Text fw={700} size="md" component="span" c="white" style={{ letterSpacing: '-0.02em', marginLeft: 4 }}>
+              <Text component="span" c="white" fw={700}>KO</Text>
+              <Text component="span" c="white" opacity={0.9}>munidad </Text>
+              <Text component="span" c="white" fw={700}>NE</Text>
+              <Text component="span" c="white" opacity={0.9}>twork for </Text>
+              <Text component="span" c="white" fw={700}>K</Text>
+              <Text component="span" c="white" opacity={0.9}>alusugan</Text>
             </Text>
           </Group>
           <Group>
@@ -75,6 +88,7 @@ export default function AppShellLayout({
               style={{
                 fontWeight: 600,
                 transition: 'all 0.2s ease',
+                color: 'white',
               }}
             >
               Logout
@@ -86,8 +100,8 @@ export default function AppShellLayout({
       <AppShell.Navbar 
         p="md" 
         style={{ 
-          borderRight: '1px solid rgba(12, 166, 120, 0.1)',
-          background: 'rgba(255, 255, 255, 0.98)',
+          borderRight: '1px solid rgba(34, 177, 76, 0.2)',
+          background: '#ffffff',
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -101,7 +115,7 @@ export default function AppShellLayout({
           onClick={handleAddClick} 
           mb="lg" 
           style={{ 
-            boxShadow: '0 4px 14px 0 rgba(12, 166, 120, 0.25)',
+            boxShadow: '0 4px 14px 0 rgba(34, 177, 76, 0.25)',
             fontWeight: 600,
             transition: 'all 0.2s ease',
           }} 
@@ -216,7 +230,7 @@ export default function AppShellLayout({
           }}
         />
         </div>
-        <Group gap={2} wrap="wrap" mt="auto" pt="sm" style={{ borderTop: '1px solid rgba(12, 166, 120, 0.1)' }}>
+        <Group gap={2} wrap="wrap" mt="auto" pt="sm" style={{ borderTop: '1px solid rgba(34, 177, 76, 0.2)' }}>
           <Group gap={2} wrap="nowrap">
             <Copyright size={10} style={{ color: 'var(--mantine-color-dimmed)' }} />
             <Text size="xs" c="dimmed" fw={500} style={{ fontSize: '10px', lineHeight: 1.3 }}>
@@ -231,7 +245,7 @@ export default function AppShellLayout({
 
       <AppShell.Main
         style={{
-          background: 'linear-gradient(180deg, #f8fbfa 0%, #f0f4f8 100%)',
+          background: '#f5f5e8',
           minHeight: 'calc(100vh - 64px)',
         }}
       >

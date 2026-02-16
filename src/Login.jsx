@@ -37,7 +37,7 @@ export default function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(165deg, #e6fcf5 0%, #b2f2e2 30%, #f0f4f8 70%, #fff 100%)',
+        background: '#f5f5e8',
         padding: 24,
         position: 'relative',
         overflow: 'hidden',
@@ -52,7 +52,7 @@ export default function Login() {
           width: '600px',
           height: '600px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.1) 0%, rgba(12, 166, 120, 0.05) 100%)',
+          background: 'linear-gradient(135deg, rgba(34, 177, 76, 0.1) 0%, rgba(34, 177, 76, 0.05) 100%)',
           filter: 'blur(60px)',
           zIndex: 0,
         }}
@@ -65,7 +65,7 @@ export default function Login() {
           width: '500px',
           height: '500px',
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.08) 0%, rgba(12, 166, 120, 0.03) 100%)',
+          background: 'linear-gradient(135deg, rgba(34, 177, 76, 0.08) 0%, rgba(34, 177, 76, 0.03) 100%)',
           filter: 'blur(50px)',
           zIndex: 0,
         }}
@@ -79,8 +79,8 @@ export default function Login() {
           p={40} 
           radius="xl" 
           style={{ 
-            borderColor: 'rgba(12, 166, 120, 0.2)',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(12, 166, 120, 0.05)',
+            borderColor: 'rgba(34, 177, 76, 0.2)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(34, 177, 76, 0.05)',
           }}
         >
           {/* LOGO */}
@@ -138,7 +138,8 @@ export default function Login() {
                 radius="md"
                 style={{
                   fontWeight: 600,
-                  boxShadow: '0 4px 14px 0 rgba(12, 166, 120, 0.25)',
+                  boxShadow: '0 4px 14px 0 rgba(34, 177, 76, 0.25)',
+                  backgroundColor: '#22B14C',
                 }}
               >
                 Login
@@ -146,11 +147,11 @@ export default function Login() {
               
               <Text c="dimmed" size="xs" ta="center" mt="md" style={{ lineHeight: 1.6 }}>
                 By clicking Login, you agree to our{' '}
-                <Anchor component="button" type="button" size="xs" c="teal.7" fw={600} onClick={() => setShowLegalPage(true)}>
+                <Anchor component="button" type="button" size="xs" c="#22B14C" fw={600} onClick={() => setShowLegalPage(true)}>
                   Terms of Use
                 </Anchor>
                 {' '}and{' '}
-                <Anchor component="button" type="button" size="xs" c="teal.7" fw={600} onClick={() => setShowLegalPage(true)}>
+                <Anchor component="button" type="button" size="xs" c="#22B14C" fw={600} onClick={() => setShowLegalPage(true)}>
                   Privacy Policy
                 </Anchor>.
               </Text>

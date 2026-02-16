@@ -65,12 +65,12 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
             radius="lg" 
             style={{ 
               height: '100%',
-              background: 'linear-gradient(135deg, #e6fcf5 0%, #ffffff 100%)',
-              border: '1px solid rgba(12, 166, 120, 0.1)',
+              background: 'linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%)',
+              border: '1px solid rgba(34, 177, 76, 0.15)',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             }}
           >
-            <Title order={2} c="teal.9" mb="xs" style={{ fontWeight: 800 }}>Welcome Back!</Title>
+            <Title order={2} c="#22B14C" mb="xs" style={{ fontWeight: 800 }}>Welcome Back!</Title>
             <Group mt="md" gap="md">
               <ThemeIcon 
                 color="teal" 
@@ -78,12 +78,12 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
                 size="xl"
                 radius="md"
                 style={{
-                  boxShadow: '0 2px 8px rgba(12, 166, 120, 0.2)',
+                  boxShadow: '0 2px 8px rgba(34, 177, 76, 0.2)',
                 }}
               >
                 <Clock size={22} />
               </ThemeIcon>
-              <Text size="xl" fw={700} c="teal.8" style={{ letterSpacing: '-0.01em' }}>
+              <Text size="xl" fw={700} c="#22B14C" style={{ letterSpacing: '-0.01em' }}>
                 {currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 {' | '}
                 {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
@@ -137,9 +137,9 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
           p="xl" 
           radius="lg" 
           style={{ 
-            background: 'linear-gradient(135deg, #e6fcf5 0%, #ffffff 100%)', 
-            borderLeft: '4px solid #0ca678',
-            border: '1px solid rgba(12, 166, 120, 0.1)',
+            background: 'linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%)', 
+            borderLeft: '4px solid #22B14C',
+            border: '1px solid rgba(34, 177, 76, 0.15)',
             ...cardStyle 
           }}
           onClick={() => onFilterSelect('all')}
@@ -157,7 +157,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
               <Text size="xs" c="dimmed" fw={700} tt="uppercase" style={{ letterSpacing: '0.1em' }}>
                 Total Patients
               </Text>
-              <Text size="2.5rem" fw={800} c="teal" style={{ lineHeight: 1.2, marginTop: '4px' }}>
+              <Text size="2.5rem" fw={800} c="#22B14C" style={{ lineHeight: 1.2, marginTop: '4px' }}>
                 {safePatients.length}
               </Text>
             </div>
@@ -168,7 +168,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
               radius="md"
               style={{
                 opacity: 0.8,
-                boxShadow: '0 2px 8px rgba(12, 166, 120, 0.2)',
+                boxShadow: '0 2px 8px rgba(34, 177, 76, 0.2)',
               }}
             >
               <FileText size={32} />
@@ -396,7 +396,7 @@ export default function DashboardView({ patients = [], currentTime, handleAddCli
           fullWidth 
           mt="md" 
           onClick={() => onFilterSelect('all')}
-          style={{ fontWeight: 600 }}
+          style={{ fontWeight: 600, color: '#22B14C' }}
         >
           View All Records
         </Button>

@@ -61,7 +61,7 @@ function App() {
           alignItems: 'center',
           height: '100vh',
           gap: 24,
-          background: 'linear-gradient(160deg, #e6fcf5 0%, #f0f4f8 50%, #fff 100%)',
+          background: '#f5f5e8',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -75,7 +75,7 @@ function App() {
             width: '500px',
             height: '500px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.1) 0%, rgba(12, 166, 120, 0.05) 100%)',
+            background: 'linear-gradient(135deg, rgba(34, 177, 76, 0.1) 0%, rgba(34, 177, 76, 0.05) 100%)',
             filter: 'blur(60px)',
             animation: 'pulse 3s ease-in-out infinite',
           }}
@@ -88,7 +88,7 @@ function App() {
             width: '400px',
             height: '400px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(12, 166, 120, 0.08) 0%, rgba(12, 166, 120, 0.03) 100%)',
+            background: 'linear-gradient(135deg, rgba(34, 177, 76, 0.08) 0%, rgba(34, 177, 76, 0.03) 100%)',
             filter: 'blur(50px)',
             animation: 'pulse 3s ease-in-out infinite 1.5s',
           }}
@@ -148,7 +148,7 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(165deg, #e6fcf5 0%, #b2f2e2 30%, #f0f4f8 70%, #fff 100%)',
+          background: '#f5f5e8',
           padding: 24,
         }}
       >

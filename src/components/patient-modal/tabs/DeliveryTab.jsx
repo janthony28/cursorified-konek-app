@@ -242,6 +242,53 @@ export default function DeliveryTab({ formData, setFormData, formErrors, handleB
 
       <Paper withBorder radius="md" overflow="hidden" mt="md" style={{ opacity: isAborted ? 0.5 : 1 }}>
         <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Text size="sm" fw={700} c="blue.9" align="center">Birth Registration</Text>
+        </Box>
+        <Stack p="sm" gap="xs">
+          <Input.Wrapper label="Birth Registered?">
+            <Group mt="xs" gap="md">
+              <Checkbox
+                label="Yes"
+                checked={formData.birth_registered === true}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked;
+                  setFormData({
+                    ...formData,
+                    birth_registered: checked ? true : null,
+                    ...(checked ? {} : { birth_registration_date: '' }),
+                  });
+                }}
+              />
+              <Checkbox
+                label="No"
+                checked={formData.birth_registered === false}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked;
+                  if (checked) {
+                    setFormData({
+                      ...formData,
+                      birth_registered: false,
+                      birth_registration_date: '',
+                    });
+                  }
+                }}
+              />
+            </Group>
+          </Input.Wrapper>
+          {formData.birth_registered === true && (
+            <Input.Wrapper label="Date of registration">
+              <Input
+                type="date"
+                value={formData.birth_registration_date || ''}
+                onChange={(e) => setFormData({ ...formData, birth_registration_date: e.target.value })}
+              />
+            </Input.Wrapper>
+          )}
+        </Stack>
+      </Paper>
+
+      <Paper withBorder radius="md" overflow="hidden" mt="md" style={{ opacity: isAborted ? 0.5 : 1 }}>
+        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
           <Text size="sm" fw={700} c="blue.9" align="center">Place of Delivery</Text>
         </Box>
         <Grid p="sm">

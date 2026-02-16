@@ -26,8 +26,8 @@ const NEONATAL_DEATH_FIELDS = [
 ];
 
 const BIRTH_REGISTRATION_FIELDS = [
+  'birth_registered', // Primary field from Labor, Delivery and Birth Outcomes tab
   'birth_registration_status',
-  'birth_registered',
   'is_birth_registered',
   'newborn_registered',
   'is_newborn_registered',

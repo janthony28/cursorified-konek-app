@@ -22,6 +22,210 @@ export default function GeneralTab({ formData, setFormData, formErrors, getAgeGr
         </Grid>
       </Paper>
 
+      <Paper withBorder radius="md" overflow="hidden" mb="md">
+        <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
+          <Text size="sm" fw={700} c="blue.9" align="center">General Data</Text>
+        </Box>
+        <Grid p="sm">
+          <Grid.Col span={12}>
+            <Input.Wrapper label="Civil Status">
+              <Group mt="xs" gap="md">
+                {['Single', 'Married', 'Widowed', 'Legally Separated'].map((status) => (
+                  <Checkbox
+                    key={status}
+                    label={status}
+                    checked={(formData.civil_status || '') === status}
+                    onChange={() => setFormData({ ...formData, civil_status: (formData.civil_status || '') === status ? '' : status })}
+                  />
+                ))}
+              </Group>
+            </Input.Wrapper>
+          </Grid.Col>
+
+          <Grid.Col span={12}>
+            <Input.Wrapper label="Solo Parent">
+              <Group mt="xs" gap="md">
+                <Checkbox
+                  label="Yes"
+                  checked={formData.is_solo_parent === true}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setFormData({
+                      ...formData,
+                      is_solo_parent: checked,
+                      ...(checked ? {} : {
+                        solo_parent_type: '',
+                        solo_parent_other: '',
+                      }),
+                    });
+                  }}
+                />
+                <Checkbox
+                  label="No"
+                  checked={formData.is_solo_parent === false}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    if (checked) {
+                      setFormData({
+                        ...formData,
+                        is_solo_parent: false,
+                        solo_parent_type: '',
+                        solo_parent_other: '',
+                      });
+                    }
+                  }}
+                />
+              </Group>
+            </Input.Wrapper>
+            {formData.is_solo_parent === true && (
+              <Stack mt="xs" gap="xs" pl="md">
+                <Select
+                  label="Solo parent type"
+                  placeholder="Select one"
+                  clearable
+                  data={[
+                    { value: 'unmarried', label: 'Unmarried mother/father' },
+                    { value: 'separated', label: 'Separated (not legally married / abandoned)' },
+                    { value: 'legally_separated', label: 'Legally separated' },
+                    { value: 'widow', label: 'Widow/Widower' },
+                    { value: 'incarcerated', label: 'Spouse incarcerated' },
+                    { value: 'disability', label: 'Spouse with disability / unable to provide support' },
+                    { value: 'others', label: 'Others (pls. specify)' },
+                  ]}
+                  value={formData.solo_parent_type || null}
+                  onChange={(val) => setFormData({
+                    ...formData,
+                    solo_parent_type: val || '',
+                    solo_parent_other: val !== 'others' ? '' : (formData.solo_parent_other || ''),
+                  })}
+                />
+                {(formData.solo_parent_type || '') === 'others' && (
+                  <TextInput
+                    label="Please specify"
+                    placeholder="Specify..."
+                    value={formData.solo_parent_other || ''}
+                    onChange={(e) => setFormData({ ...formData, solo_parent_other: e.target.value })}
+                  />
+                )}
+              </Stack>
+            )}
+          </Grid.Col>
+
+          <Grid.Col span={12}>
+            <Input.Wrapper label="PhilHealth Member">
+              <Group mt="xs" gap="md">
+                <Checkbox
+                  label="Member"
+                  checked={formData.philhealth_status === 'Member'}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setFormData({
+                      ...formData,
+                      philhealth_status: checked ? 'Member' : '',
+                      ...(checked ? {} : { philhealth_type: '' }),
+                    });
+                  }}
+                />
+                <Checkbox
+                  label="Dependent"
+                  checked={formData.philhealth_status === 'Dependent'}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setFormData({
+                      ...formData,
+                      philhealth_status: checked ? 'Dependent' : '',
+                      philhealth_type: '',
+                    });
+                  }}
+                />
+                <Checkbox
+                  label="Not a member/ No Philhealth"
+                  checked={formData.philhealth_status === 'Not a member'}
+                  onChange={(e) => {
+                    const checked = e.currentTarget.checked;
+                    setFormData({
+                      ...formData,
+                      philhealth_status: checked ? 'Not a member' : '',
+                      philhealth_type: '',
+                    });
+                  }}
+                />
+              </Group>
+            </Input.Wrapper>
+            {formData.philhealth_status === 'Member' && (
+              <Select
+                mt="xs"
+                ml="md"
+                label="PhilHealth membership type"
+                placeholder="Select one"
+                clearable
+                data={[
+                  { value: 'formal', label: 'Formal Economy' },
+                  { value: 'informal', label: 'Informal Economy' },
+                  { value: 'indigent', label: 'Indigent' },
+                  { value: 'sponsored', label: 'Sponsored' },
+                ]}
+                value={formData.philhealth_type || null}
+                onChange={(val) => setFormData({ ...formData, philhealth_type: val || '' })}
+              />
+            )}
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Input.Wrapper label="SSS Member">
+              <Group mt="xs" gap="md">
+                <Checkbox
+                  label="Yes"
+                  checked={formData.sss_member === true}
+                  onChange={(e) => setFormData({ ...formData, sss_member: e.currentTarget.checked ? true : null })}
+                />
+                <Checkbox
+                  label="No"
+                  checked={formData.sss_member === false}
+                  onChange={(e) => setFormData({ ...formData, sss_member: e.currentTarget.checked ? false : null })}
+                />
+              </Group>
+            </Input.Wrapper>
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <Input.Wrapper label="GSIS Member">
+              <Group mt="xs" gap="md">
+                <Checkbox
+                  label="Yes"
+                  checked={formData.gsis_member === true}
+                  onChange={(e) => setFormData({ ...formData, gsis_member: e.currentTarget.checked ? true : null })}
+                />
+                <Checkbox
+                  label="No"
+                  checked={formData.gsis_member === false}
+                  onChange={(e) => setFormData({ ...formData, gsis_member: e.currentTarget.checked ? false : null })}
+                />
+              </Group>
+            </Input.Wrapper>
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <TextInput
+              label="Contact No."
+              placeholder="e.g. 09123456789"
+              value={formData.contact_no || ''}
+              onChange={(e) => setFormData({ ...formData, contact_no: e.target.value })}
+            />
+          </Grid.Col>
+
+          <Grid.Col span={6}>
+            <TextInput
+              label="Email address"
+              placeholder="e.g. example@email.com"
+              type="email"
+              value={formData.email_address || ''}
+              onChange={(e) => setFormData({ ...formData, email_address: e.target.value })}
+            />
+          </Grid.Col>
+        </Grid>
+      </Paper>
+
       <Paper withBorder radius="md" overflow="hidden" style={{ borderColor: '#dee2e6' }}>
         <Box bg="blue.1" p="xs" style={{ borderBottom: '1px solid #dee2e6' }}>
           <Text size="sm" fw={700} c="blue.9" align="center">Pregnancy Information</Text>

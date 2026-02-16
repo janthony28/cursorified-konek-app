@@ -85,5 +85,21 @@ export function getInitialFormState() {
 
     delivery_attendant_specify: '',
     delivery_place_specify: '',
+
+    // General Data fields
+    civil_status: '',
+    is_solo_parent: null,
+    solo_parent_type: '',
+    solo_parent_other: '',
+    philhealth_status: '',
+    philhealth_type: '',
+    sss_member: null,
+    gsis_member: null,
+    contact_no: '',
+    email_address: '',
+
+    // Birth Registration
+    birth_registered: null,
+    birth_registration_date: '',
   };
 }

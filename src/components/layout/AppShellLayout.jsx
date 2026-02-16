@@ -1,5 +1,5 @@
 import { AppShell, Burger, Group, NavLink, Text, Button } from '@mantine/core';
-import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus, Copyright } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus, Copyright, BarChart3 } from 'lucide-react';
 
 export default function AppShellLayout({
   mobileOpened,
@@ -11,6 +11,7 @@ export default function AppShellLayout({
   handleAddClick,
   handleLogout,
   isAdmin,
+  showStatisticsTab = false,
   filterStatus,
   setFilterStatus,
   modalOpened,
@@ -160,6 +161,21 @@ export default function AppShellLayout({
             fontWeight: activePage === 'reports' ? 600 : 500,
           }}
         />
+        {showStatisticsTab && (
+          <NavLink
+            label="Statistics"
+            leftSection={<BarChart3 size={18} />}
+            active={activePage === 'statistics'}
+            onClick={() => handleNavClick('statistics')}
+            variant="light"
+            color="teal"
+            style={{
+              borderRadius: '8px',
+              marginBottom: '4px',
+              fontWeight: activePage === 'statistics' ? 600 : 500,
+            }}
+          />
+        )}
         <Text 
           c="dimmed" 
           size="xs" 

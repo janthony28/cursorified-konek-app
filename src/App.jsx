@@ -11,6 +11,7 @@ import DashboardView from './components/dashboard/DashboardView';
 import RecordsView from './components/records/RecordsView';
 import ReportsView from './components/reports/ReportsView';
 import HelpView from './components/help/HelpView';
+import StatisticsView from './components/statistics/StatisticsView';
 import AppShellLayout from './components/layout/AppShellLayout';
 import PatientModal from './components/patient-modal/PatientModal';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
@@ -868,7 +869,8 @@ function MainApp({ session, onLogout }) {
     activePage === 'dashboard' ? <DashboardView patients={patients} currentTime={currentTime} handleAddClick={handleAddClick} onFilterSelect={handleFilterSelect} /> :
       activePage === 'records' ? <RecordsView patients={patients} search={search} setSearch={setSearch} handleAddClick={handleAddClick} handleEditClick={handleEditClick} handleDelete={handleDelete} isAdmin={isAdmin} getAgeGroup={getAgeGroup} filterStatus={filterStatus} setFilterStatus={setFilterStatus} modalOpened={opened} /> :
         activePage === 'reports' ? <ReportsView patients={patients} /> :
-          activePage === 'help' ? <HelpView /> : null;
+          activePage === 'statistics' ? (isAdmin ? <StatisticsView isAdmin={isAdmin} userId={session.user.id} /> : <DashboardView patients={patients} currentTime={currentTime} handleAddClick={handleAddClick} onFilterSelect={handleFilterSelect} />) :
+            activePage === 'help' ? <HelpView /> : null;
 
   return (
     <>
@@ -882,6 +884,7 @@ function MainApp({ session, onLogout }) {
         handleAddClick={handleAddClick}
         handleLogout={handleLogout}
         isAdmin={isAdmin}
+        showStatisticsTab={isAdmin}
         filterStatus={filterStatus}
         setFilterStatus={setFilterStatus}
         modalOpened={opened}

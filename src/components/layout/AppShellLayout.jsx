@@ -1,5 +1,5 @@
 import { AppShell, Burger, Group, NavLink, Text, Button } from '@mantine/core';
-import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus, Copyright, BarChart3 } from 'lucide-react';
+import { LogOut, LayoutDashboard, FileText, Activity, Info, Plus, Copyright, BarChart3, BookOpen } from 'lucide-react';
 
 export default function AppShellLayout({
   mobileOpened,
@@ -200,6 +200,19 @@ export default function AppShellLayout({
             borderRadius: '8px',
             marginBottom: '4px',
             fontWeight: activePage === 'help' ? 600 : 500,
+          }}
+        />
+        <NavLink 
+          label="About" 
+          leftSection={<BookOpen size={18} />} 
+          active={activePage === 'about'} 
+          onClick={() => handleNavClick('about')} 
+          variant="light" 
+          color="teal"
+          style={{
+            borderRadius: '8px',
+            marginBottom: '4px',
+            fontWeight: activePage === 'about' ? 600 : 500,
           }}
         />
         </div>

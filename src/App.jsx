@@ -11,6 +11,7 @@ import DashboardView from './components/dashboard/DashboardView';
 import RecordsView from './components/records/RecordsView';
 import ReportsView from './components/reports/ReportsView';
 import HelpView from './components/help/HelpView';
+import AboutView from './components/help/AboutView';
 import StatisticsView from './components/statistics/StatisticsView';
 import AppShellLayout from './components/layout/AppShellLayout';
 import PatientModal from './components/patient-modal/PatientModal';
@@ -870,7 +871,8 @@ function MainApp({ session, onLogout }) {
       activePage === 'records' ? <RecordsView patients={patients} search={search} setSearch={setSearch} handleAddClick={handleAddClick} handleEditClick={handleEditClick} handleDelete={handleDelete} isAdmin={isAdmin} getAgeGroup={getAgeGroup} filterStatus={filterStatus} setFilterStatus={setFilterStatus} modalOpened={opened} /> :
         activePage === 'reports' ? <ReportsView patients={patients} /> :
           activePage === 'statistics' ? (isAdmin ? <StatisticsView isAdmin={isAdmin} userId={session.user.id} /> : <DashboardView patients={patients} currentTime={currentTime} handleAddClick={handleAddClick} onFilterSelect={handleFilterSelect} />) :
-            activePage === 'help' ? <HelpView /> : null;
+            activePage === 'help' ? <HelpView /> :
+              activePage === 'about' ? <AboutView /> : null;
 
   return (
     <>
